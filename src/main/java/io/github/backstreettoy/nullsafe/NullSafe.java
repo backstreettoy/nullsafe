@@ -1,5 +1,6 @@
 package io.github.backstreettoy.nullsafe;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -15,7 +16,7 @@ import io.github.backstreettoy.nullsafe.impl.Pair;
 public class NullSafe {
 
     /**
-     * Invoke action function when obj is not null.
+     * Applying action function if obj is not null.
      * @param obj target object
      * @param action the function called when obj is not null
      * @param <T> the class of the value
@@ -25,23 +26,38 @@ public class NullSafe {
     }
 
     /**
-     * Invoke not null action function when obj is not null, otherwise invoke null action.
+     * Applying action function if optional is present
+     * @param optional optional object
+     * @param action the function applied when optional is not null
+     * @param <T> the class of the value
+     */
+    public static final <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
+        return;
+    }
+
+    /**
+     * Appling notNullAction function when obj is not null, otherwise nullAction function applied.
      * @param obj target object
      * @param notNullAction required, the function called when obj is not null
      * @param nullAction not required, the function called when obj is null, nothing will happen if this param is null
      * @param <T> the class of the value
      */
-    public static final <T> void notNullThen(Object obj, Consumer<T> notNullAction, Consumer<Void> nullAction) {
+    public static final <T> void notNullThen(Object obj, Consumer<T> notNullAction, Action nullAction) {
 
     }
 
     /**
-     * Handle elements not null in iterable by function action
+     * Applying the action function to each element not null in iterable
      * @param iterable an iterable object
      * @param action the function called for each element
      * @param <T> the class of the element
      */
-    public static final <T> void handleNotNullElements(Iterable<T> iterable, Consumer<T> action) {
+    public static final <T> void notNullElementsThen(Iterable<T> iterable, Consumer<T> action) {
+
+    }
+
+    public static final <T extends Iterable<I>, I> void notNullElementsThenByOptional(Optional<T> iterable,
+            Consumer<I> action) {
 
     }
 
@@ -69,6 +85,19 @@ public class NullSafe {
 
     }
 
+    /**
+     *
+     * @param t1
+     * @param t2
+     * @param action
+     * @param <T1>
+     * @param <T2>
+     */
+    public static final <T1, T2> void noneOfNullThenByOptional(Optional<T1> t1, Optional<T2> t2,
+            BiConsumer<T1, T2> action) {
+
+    }
+
     public static final <T1, T2> void noneOfNullThen(T1 t1, T2 t2,
             BiConsumer<T1, T2> noneOfNullAction,
             BiConsumer<T1, T2> someIsNullAction) {
@@ -79,7 +108,7 @@ public class NullSafe {
      * Invoke noneOfNullAction if both the value property of t1 and t2 are not null, otherwise invoke anyOfNullAction.
      * @param t1 param t1
      * @param t2 param t2
-     * @param noneOfNullAction the function called when both t1 and t2 are not null
+     * @param noneOfNullAction not required, the function called when both t1 and t2 are not null
      * @param someIsNullAction not required, the function called when any of t1 and t2 is null.
      * @param <K1> the class of the key property of t1
      * @param <K2> the class of the key property of t2
@@ -149,5 +178,15 @@ public class NullSafe {
 
     public interface BiConsumer<T1, T2> {
         void consume(T1 t1, T2 t2);
+    }
+
+    public interface Action {
+        void act();
+    }
+
+    public static void main(String[] args) {
+        NullSafe.noneOfNullThenByOptional(Optional.ofNullable("a"), Optional.ofNullable("b"), (x, y) -> {
+
+        });
     }
 }
