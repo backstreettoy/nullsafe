@@ -1,7 +1,7 @@
 package io.github.backstreettoy.nullsafe;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -9,7 +9,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import io.github.backstreettoy.nullsafe.functions.Action;
+import io.github.backstreettoy.nullsafe.impl.CompositeNullSafe;
 import io.github.backstreettoy.nullsafe.impl.IterableNullSafe;
+import io.github.backstreettoy.nullsafe.impl.OptionalValuePair;
 import io.github.backstreettoy.nullsafe.impl.Pair;
 import io.github.backstreettoy.nullsafe.impl.SingleNullSafe;
 
@@ -21,6 +23,7 @@ public final class NullSafe {
 
     private static final SingleNullSafe SINGLE_ASSERTION = SingleNullSafe.getInstance();
     private static final IterableNullSafe ITERABLE_ASSERTION = IterableNullSafe.getInstance();
+    private static final CompositeNullSafe COMPOSITE_NULL_SAFE = CompositeNullSafe.getInstance();
 
     /**
      * Applying map function if obj is not null
@@ -40,8 +43,8 @@ public final class NullSafe {
      * @param action the function called when obj is not null
      * @param <T> the class of the param obj
      */
-    public static <T> void notNullThen(T obj, Consumer<T> action) {
-        SINGLE_ASSERTION.notNullThen(obj, action);
+    public static <T> boolean notNullThen(T obj, Consumer<T> action) {
+        return SINGLE_ASSERTION.notNullThen(obj, action);
     }
     /**
      * Applying action function if optional is present.
@@ -49,8 +52,8 @@ public final class NullSafe {
      * @param action required, the function applied when optional is not null
      * @param <T> the class of the value
      */
-    public static <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
-        SINGLE_ASSERTION.notNullThenByOptional(optional, action);
+    public static <T> boolean notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
+        return SINGLE_ASSERTION.notNullThenByOptional(optional, action);
     }
 
     /**
@@ -60,8 +63,8 @@ public final class NullSafe {
      * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static <T> void notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
-        SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
+    public static <T> boolean notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+        return SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
     }
 
     /**
@@ -71,10 +74,10 @@ public final class NullSafe {
      * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static final <T> void notNullThenByOptional(Optional<T> optional,
+    public static final <T> boolean notNullThenByOptional(Optional<T> optional,
             Consumer<T> notNullAction,
             Action nullAction) {
-        SINGLE_ASSERTION.notNullThenByOptional(optional, notNullAction, nullAction);
+        return SINGLE_ASSERTION.notNullThenByOptional(optional, notNullAction, nullAction);
     }
 
     /**
@@ -88,64 +91,73 @@ public final class NullSafe {
     }
 
     /**
-     * Creating a new stream based on param stream filtering out null elements and then applying a map function
-     * on each not null element.
+     * Creating a new stream filtering out null elements and applying map function on exist elements.
      * @param stream
      * @param map
      * @param <T>
      * @param <R>
      * @return
      */
-    public static final <T, R> Stream<? super R> mapNotNullElements(Stream<T> stream, Function<T,R> map) {
-        return ITERABLE_ASSERTION.mapNotNullElements(stream, map);
+    public static final <T, R> Stream<? super R> mapExistElements(Stream<T> stream, Function<T,R> map) {
+        return ITERABLE_ASSERTION.mapExistElements(stream, map);
     }
 
     /**
-     * Invoke action function if both t1 and t2 are not null.
+     * Invoking the action function if all data params exist.
+     * @param params the data params
+     * @param action the function called when all data params exist
+     */
+    public static final boolean allExistThen(Action action, Object... params) {
+        return COMPOSITE_NULL_SAFE.allExistThen(action, params);
+    }
+
+    /**
+     * Invoking the action function if all Optional params are present.
+     * @param params the Optional params
+     * @param action the function called when all Optional params are present
+     */
+    public static final boolean allExistThenByOptional(Action action, Optional<?>... params) {
+        return COMPOSITE_NULL_SAFE.allExistThenByOptional(action, params);
+    }
+
+    /**
+     * Invoking the noneOfNullAction function if all Optional params are present,
+     * someOfNullConsumer function otherwise.
+     * @param noneOfNullAction the function called when all Optional params are present
+     * @param someOfNullConsumer the function called when some Optional params is not present,
+     *                          the keys of the OptionalValuePair which value not present will be passed as param
+     * @param params the OptionalValuePair params
+     */
+    public static <K> boolean allExistThenByOptional(Action noneOfNullAction,
+            Consumer<List<K>> someOfNullConsumer,
+            OptionalValuePair<K, ?>... params) {
+        return COMPOSITE_NULL_SAFE.allExistThenByOptional(noneOfNullAction,
+                someOfNullConsumer,
+                params);
+    }
+
+
+    public static final <T1, T2> boolean allExistThen(T1 t1, T2 t2,
+            Action noneOfNullAction,
+            Action someIsNullAction) {
+        return COMPOSITE_NULL_SAFE.allExistThen(noneOfNullAction,
+                someIsNullAction,
+                t1, t2);
+    }
+
+    /**
+     * Applying noneOfNullAction if all data params are not null, otherwise someOfNullConsumer function applied.
      * @param t1 param t1
      * @param t2 param t2
-     * @param action the function called when both t1 and t2 are not null
-     * @param <T1> the class of t1
-     * @param <T2> the class of t2
+     * @param noneOfNullAction not required, the function called when all data params are not null
+     * @param someOfNullConsumer not required, the function called when any of data params is null,
+     *                          param of the consumer is the key of null values
+     * @param <K> the class of the key property
      */
-    public static final <T1, T2> void noneOfNullThen(T1 t1, T2 t2, BiConsumer<T1, T2> action) {
-
-    }
-
-    /**
-     *
-     * @param t1
-     * @param t2
-     * @param action
-     * @param <T1>
-     * @param <T2>
-     */
-    public static final <T1, T2> void noneOfNullThenByOptional(Optional<T1> t1, Optional<T2> t2,
-            BiConsumer<T1, T2> action) {
-
-    }
-
-    public static final <T1, T2> void noneOfNullThen(T1 t1, T2 t2,
-            BiConsumer<T1, T2> noneOfNullAction,
-            BiConsumer<T1, T2> someIsNullAction) {
-
-    }
-
-    /**
-     * Invoke noneOfNullAction if both the value property of t1 and t2 are not null, otherwise invoke anyOfNullAction.
-     * @param t1 param t1
-     * @param t2 param t2
-     * @param noneOfNullAction not required, the function called when both t1 and t2 are not null
-     * @param someIsNullAction not required, the function called when any of t1 and t2 is null.
-     * @param <K1> the class of the key property of t1
-     * @param <K2> the class of the key property of t2
-     * @param <V1> the class of the value property of t1
-     * @param <V2> the class of the value property of t2
-     */
-    public static final <K1, K2, V1, V2> void noneOfNullThen(Pair<K1, V1> t1, Pair<K2, V2> t2,
-            BiConsumer<Pair<K1, V1>, Pair<K2, V2>> noneOfNullAction,
-            BiConsumer<Pair<K1, V1>, Pair<K2, V2>> someIsNullAction) {
-
+    public static <K> boolean allExistThen(Pair<K, ?> t1, Pair<K, ?> t2,
+            Action noneOfNullAction,
+            Consumer<List<K>> someOfNullConsumer) {
+        return COMPOSITE_NULL_SAFE.allExistThen(noneOfNullAction, someOfNullConsumer, t1, t2);
     }
 
     /**
@@ -159,8 +171,8 @@ public final class NullSafe {
      * @param <R> the class of return type
      * @return value of type R result from map function result or fallback value
      */
-    public static final <T1, T2, R> R mapIfNoneOfNullOrElse(T1 t1, T2 t2, BiFunction<T1, T2, R> map, R fallback) {
-        return null;
+    public static final <T1, T2, R> R mapIfAllExistOrElse(T1 t1, T2 t2, BiFunction<T1, T2, R> map, R fallback) {
+        COMPOSITE_NULL_SAFE.mapIfAllExistOrElse()
     }
 
     /**
@@ -174,32 +186,89 @@ public final class NullSafe {
      * @param <R> the class of return type
      * @return value of type R result from map function result or fallback function
      */
-    public static final <T1, T2, R> R mapIfNoneOfNullOrElseGet(T1 t1, T2 t2, BiFunction<T1, T2, R> map, Supplier<R> fallback) {
+    public static final <T1, T2, R> R mapIfAllExistOrElseGet(T1 t1, T2 t2, BiFunction<T1, T2, R> map, Supplier<R> fallback) {
         return null;
     }
 
-    public static final <T> T coalesce(T t1, T t2) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public static final <T> Optional<? super T> coalesce(T t1, T t2) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2);
     }
 
-    public <T> T coalesce(T t1, T t2, T t3) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param t3 third param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public <T> Optional<? super T> coalesce(T t1, T t2, T t3) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3);
     }
 
-    public <T> T coalesce(T t1, T t2, T t3, T t4) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param t3 third param
+     * @param t4 forth param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4);
     }
 
-    public <T> T coalesce(T t1, T t2, T t3, T t4, T t5) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param t3 third param
+     * @param t4 forth param
+     * @param t5 fifth param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5);
     }
 
-    public <T> T coalesce(T t1, T t2, T t3, T t4, T t5, T t6) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param t3 third param
+     * @param t4 forth param
+     * @param t5 fifth param
+     * @param t6 sixth param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5, T t6) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5, t6);
     }
 
-    public <T> T coalesce(T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
-        return null;
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param t1 first param
+     * @param t2 second param
+     * @param t3 third param
+     * @param t4 forth param
+     * @param t5 fifth param
+     * @param t6 sixth param
+     * @param t7 seventh param
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
+        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5, t6, t7);
     }
 
 }

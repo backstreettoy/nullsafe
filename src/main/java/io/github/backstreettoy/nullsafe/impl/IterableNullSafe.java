@@ -8,44 +8,44 @@ import java.util.stream.Stream;
  *
  * @author backstreettoy
  */
-public class IterableNullSafe {
+public final class IterableNullSafe {
 
-    private static final IterableNullSafe ITERABLE_ASSERTION = new IterableNullSafe();
-    private static final SingleNullSafe SINGLE_ASSERTION = SingleNullSafe.getInstance();
+    private static final IterableNullSafe INSTANCE = new IterableNullSafe();
+    private static final SingleNullSafe SINGLE_NULL_SAFE = SingleNullSafe.getInstance();
 
     public static IterableNullSafe getInstance() {
-        return ITERABLE_ASSERTION;
+        return INSTANCE;
     }
 
     /**
      * @see io.github.backstreettoy.nullsafe.NullSafe#notNullElementsThen(Iterable, Consumer)
      */
-    public final <T> void notNullElementsThen(Iterable<T> iterable, Consumer<T> action) {
-        if (SINGLE_ASSERTION.isNull(iterable)) {
+    public <T> void notNullElementsThen(Iterable<T> iterable, Consumer<T> action) {
+        if (SINGLE_NULL_SAFE.isNull(iterable)) {
             throw new NullPointerException("iterable must not be null");
         }
-        if (SINGLE_ASSERTION.isNull(action)) {
+        if (SINGLE_NULL_SAFE.isNull(action)) {
             throw new NullPointerException("action must not be null");
         }
 
         for (T element : iterable) {
-            if (!SINGLE_ASSERTION.isNull(element)) {
+            if (!SINGLE_NULL_SAFE.isNull(element)) {
                 action.accept(element);
             }
         }
     }
 
     /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#mapNotNullElements(Stream, Function)
+     * @see io.github.backstreettoy.nullsafe.NullSafe#mapExistElements(Stream, Function)
      */
-    public final <T, R> Stream<? super R> mapNotNullElements(Stream<T> stream, Function<T,R> map) {
-        if (SINGLE_ASSERTION.isNull(stream)) {
+    public <T, R> Stream<? super R> mapExistElements(Stream<T> stream, Function<T,R> map) {
+        if (SINGLE_NULL_SAFE.isNull(stream)) {
             throw new NullPointerException("stream must not be null");
         }
-        if (SINGLE_ASSERTION.isNull(map)) {
+        if (SINGLE_NULL_SAFE.isNull(map)) {
             throw new NullPointerException("map function must not be null");
         }
-        return stream.filter(x -> !SINGLE_ASSERTION.isNull(x))
-                .map(x -> map);
+        return stream.filter(x -> !SINGLE_NULL_SAFE.isNull(x))
+                .map(map::apply);
     }
 }

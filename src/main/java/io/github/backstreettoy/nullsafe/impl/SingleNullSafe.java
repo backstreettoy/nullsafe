@@ -25,48 +25,50 @@ public final class SingleNullSafe {
     /**
      * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer, Action)
      */
-    public final <T> void notNullThen(T obj, Consumer<T> action) {
+    public final <T> boolean notNullThen(T obj, Consumer<T> action) {
         if (isNull(action)) {
             throw new NullPointerException("action must not be null");
         }
-        notNullThen(obj, action, null);
+        return notNullThen(obj, action, null);
     }
 
     /**
      * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer, Action)
      */
-    public final <T> void notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
-        if (!isNull(obj)) {
+    public final <T> boolean notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+        boolean notNull = !isNull(obj);
+        if (notNull) {
             if (!isNull(notNullAction)) {
                 notNullAction.accept(obj);
             }
         } else if (!isNull(nullAction)){
             nullAction.act();
         }
+        return notNull;
     }
 
     /**
      * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThenByOptional(Optional, Consumer)
      */
-    public final <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
+    public final <T> boolean notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
         if (isNull(optional)) {
             throw new NullPointerException("optional must not be null");
         }
         T value = optional.orElse(null);
-        notNullThen(value, action);
+        return notNullThen(value, action);
     }
 
-    public final <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> notNullAction, Action nullAction) {
+    public final <T> boolean notNullThenByOptional(Optional<T> optional,
+            Consumer<T> notNullAction,
+            Action nullAction) {
         if (isNull(optional)) {
             throw new NullPointerException("optional must not be null");
         }
         T value = optional.orElse(null);
-        notNullThen(value, notNullAction, nullAction);
+        return notNullThen(value, notNullAction, nullAction);
     }
 
-
-
-    public final <T, R> Optional<R> mapNotNull(T obj, Function<T, R> map) {
+    public final <T, R> Optional<? super R> mapNotNull(T obj, Function<T, R> map) {
         if (isNull(map)) {
             throw new NullPointerException("map must not be null");
         }
@@ -75,7 +77,4 @@ public final class SingleNullSafe {
         }
         return Optional.ofNullable(map.apply(obj));
     }
-
-
-
 }

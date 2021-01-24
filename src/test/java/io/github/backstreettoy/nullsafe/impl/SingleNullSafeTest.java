@@ -34,7 +34,8 @@ public class SingleNullSafeTest {
     public void testNotNullThen() {
         Consumer mockConsumer = mock(Consumer.class);
         Object obj = new Float(Math.random());
-        singleNullSafe.notNullThen(obj, mockConsumer);
+        boolean notNull = singleNullSafe.notNullThen(obj, mockConsumer);
+        assertThat(notNull).isTrue();
         ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
         verify(mockConsumer, times(1)).accept(captor.capture());
 
@@ -44,10 +45,11 @@ public class SingleNullSafeTest {
 
     @Test
     public void testNotNullThenWithNullAction() {
-        Action mockAction = mock(Action.class);
-        Consumer mockConsumer = mock(Consumer.class);
-        singleNullSafe.notNullThen(null, mockConsumer, mockAction);
-        verify(mockAction, times(1)).act();
+        Action whenNullAction = mock(Action.class);
+        Consumer notNullConsumer = mock(Consumer.class);
+        boolean notNull = singleNullSafe.notNullThen(null, notNullConsumer, whenNullAction);
+        assertThat(notNull).isFalse();
+        verify(whenNullAction, times(1)).act();
     }
 
     @Test
@@ -67,11 +69,12 @@ public class SingleNullSafeTest {
 
     @Test
     public void testNotNullThenByOptional() {
-        Consumer mockConsumer = mock(Consumer.class);
+        Consumer notNullAction = mock(Consumer.class);
         Object obj = new Float(Math.random());
-        singleNullSafe.notNullThenByOptional(Optional.of(obj), mockConsumer);
+        boolean notNull = singleNullSafe.notNullThenByOptional(Optional.of(obj), notNullAction);
+        assertThat(notNull).isTrue();
         ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
-        verify(mockConsumer, times(1)).accept(captor.capture());
+        verify(notNullAction, times(1)).accept(captor.capture());
 
         Object captureValue = captor.getValue();
         assertThat(captureValue).isEqualTo(obj);
@@ -79,9 +82,13 @@ public class SingleNullSafeTest {
 
     @Test
     public void testNotNullThenByOptionalNullActionIsNull() {
-        Consumer mockConsumer = mock(Consumer.class);
+        Consumer notNullConsumer = mock(Consumer.class);
+        Action nullAction = mock(Action.class);
         try {
-            singleNullSafe.notNullThenByOptional(Optional.empty(), mockConsumer, null);
+            boolean notNull = singleNullSafe.notNullThenByOptional(Optional.empty(), notNullConsumer, null);
+            assertThat(notNull).isFalse();
+            notNull = singleNullSafe.notNullThenByOptional(Optional.of(1), null, nullAction);
+            assertThat(notNull).isTrue();
         } catch (NullPointerException e) {
             Assertions.fail("shoud allow null action is null");
         }
