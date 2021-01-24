@@ -17,7 +17,7 @@ import io.github.backstreettoy.nullsafe.impl.SingleNullSafe;
  * The facade class of nullsafe utility
  * @author backstreettoy
  */
-public class NullSafe {
+public final class NullSafe {
 
     private static final SingleNullSafe SINGLE_ASSERTION = SingleNullSafe.getInstance();
     private static final IterableNullSafe ITERABLE_ASSERTION = IterableNullSafe.getInstance();
@@ -30,7 +30,7 @@ public class NullSafe {
      * @param <R> the class of result
      * @return an Optional class instance, if obj is null then the result is not present
      */
-    public static final <T, R> Optional<R> mapNotNull(T obj, Function<T, R> map) {
+    public static <T, R> Optional<? super R> mapNotNull(T obj, Function<T, R> map) {
         return SINGLE_ASSERTION.mapNotNull(obj, map);
     }
 
@@ -40,7 +40,7 @@ public class NullSafe {
      * @param action the function called when obj is not null
      * @param <T> the class of the param obj
      */
-    public static final <T> void notNullThen(T obj, Consumer<T> action) {
+    public static <T> void notNullThen(T obj, Consumer<T> action) {
         SINGLE_ASSERTION.notNullThen(obj, action);
     }
     /**
@@ -49,7 +49,7 @@ public class NullSafe {
      * @param action required, the function applied when optional is not null
      * @param <T> the class of the value
      */
-    public static final <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
+    public static <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
         SINGLE_ASSERTION.notNullThenByOptional(optional, action);
     }
 
@@ -60,7 +60,7 @@ public class NullSafe {
      * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static final <T> void notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+    public static <T> void notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
         SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
     }
 
@@ -88,15 +88,16 @@ public class NullSafe {
     }
 
     /**
-     *
+     * Creating a new stream based on param stream filtering out null elements and then applying a map function
+     * on each not null element.
      * @param stream
-     * @param function
+     * @param map
      * @param <T>
      * @param <R>
      * @return
      */
-    public static final <T, R> Stream<R> mapNotNullElements(Stream<T> stream, Function<T,R> function) {
-        return null;
+    public static final <T, R> Stream<? super R> mapNotNullElements(Stream<T> stream, Function<T,R> map) {
+        return ITERABLE_ASSERTION.mapNotNullElements(stream, map);
     }
 
     /**
