@@ -1,64 +1,90 @@
 package io.github.backstreettoy.nullsafe;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import io.github.backstreettoy.nullsafe.functions.Action;
+import io.github.backstreettoy.nullsafe.impl.IterableNullSafe;
 import io.github.backstreettoy.nullsafe.impl.Pair;
+import io.github.backstreettoy.nullsafe.impl.SingleNullSafe;
 
 /**
- *
+ * The facade class of nullsafe utility
  * @author backstreettoy
  */
 public class NullSafe {
+
+    private static final SingleNullSafe SINGLE_ASSERTION = SingleNullSafe.getInstance();
+    private static final IterableNullSafe ITERABLE_ASSERTION = IterableNullSafe.getInstance();
+
+    /**
+     * Applying map function if obj is not null
+     * @param obj target object
+     * @param map the function mapping from obj to result
+     * @param <T> the class of param obj
+     * @param <R> the class of result
+     * @return an Optional class instance, if obj is null then the result is not present
+     */
+    public static final <T, R> Optional<R> mapNotNull(T obj, Function<T, R> map) {
+        return SINGLE_ASSERTION.mapNotNull(obj, map);
+    }
 
     /**
      * Applying action function if obj is not null.
      * @param obj target object
      * @param action the function called when obj is not null
-     * @param <T> the class of the value
+     * @param <T> the class of the param obj
      */
-    public static final <T> void notNullThen(Object obj, Consumer<T> action) {
-        return;
+    public static final <T> void notNullThen(T obj, Consumer<T> action) {
+        SINGLE_ASSERTION.notNullThen(obj, action);
     }
-
     /**
-     * Applying action function if optional is present
-     * @param optional optional object
-     * @param action the function applied when optional is not null
+     * Applying action function if optional is present.
+     * @param optional required, optional object
+     * @param action required, the function applied when optional is not null
      * @param <T> the class of the value
      */
     public static final <T> void notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
-        return;
+        SINGLE_ASSERTION.notNullThenByOptional(optional, action);
     }
 
     /**
      * Appling notNullAction function when obj is not null, otherwise nullAction function applied.
      * @param obj target object
-     * @param notNullAction required, the function called when obj is not null
-     * @param nullAction not required, the function called when obj is null, nothing will happen if this param is null
+     * @param notNullAction not required, the function called when obj is not null
+     * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static final <T> void notNullThen(Object obj, Consumer<T> notNullAction, Action nullAction) {
+    public static final <T> void notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+        SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
+    }
 
+    /**
+     * Appling notNullAction function when optional is present, otherwise nullAction function applied.
+     * @param optional required, optional object
+     * @param notNullAction not required, the function called when obj is not null
+     * @param nullAction not required, the function called when obj is null
+     * @param <T> the class of the value
+     */
+    public static final <T> void notNullThenByOptional(Optional<T> optional,
+            Consumer<T> notNullAction,
+            Action nullAction) {
+        SINGLE_ASSERTION.notNullThenByOptional(optional, notNullAction, nullAction);
     }
 
     /**
      * Applying the action function to each element not null in iterable
-     * @param iterable an iterable object
-     * @param action the function called for each element
+     * @param iterable required, an iterable object
+     * @param action required, the function called for each element
      * @param <T> the class of the element
      */
     public static final <T> void notNullElementsThen(Iterable<T> iterable, Consumer<T> action) {
-
-    }
-
-    public static final <T extends Iterable<I>, I> void notNullElementsThenByOptional(Optional<T> iterable,
-            Consumer<I> action) {
-
+        ITERABLE_ASSERTION.notNullElementsThen(iterable, action);
     }
 
     /**
@@ -175,18 +201,4 @@ public class NullSafe {
         return null;
     }
 
-
-    public interface BiConsumer<T1, T2> {
-        void consume(T1 t1, T2 t2);
-    }
-
-    public interface Action {
-        void act();
-    }
-
-    public static void main(String[] args) {
-        NullSafe.noneOfNullThenByOptional(Optional.ofNullable("a"), Optional.ofNullable("b"), (x, y) -> {
-
-        });
-    }
 }
