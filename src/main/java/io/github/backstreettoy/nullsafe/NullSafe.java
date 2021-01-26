@@ -63,7 +63,7 @@ public final class NullSafe {
      * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static <T> boolean notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+    public static <T> boolean notNullThenOrElse(T obj, Consumer<T> notNullAction, Action nullAction) {
         return SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
     }
 
@@ -74,7 +74,7 @@ public final class NullSafe {
      * @param nullAction not required, the function called when obj is null
      * @param <T> the class of the value
      */
-    public static final <T> boolean notNullThenByOptional(Optional<T> optional,
+    public static final <T> boolean notNullThenOrElseByOptional(Optional<T> optional,
             Consumer<T> notNullAction,
             Action nullAction) {
         return SINGLE_ASSERTION.notNullThenByOptional(optional, notNullAction, nullAction);
@@ -91,14 +91,14 @@ public final class NullSafe {
     }
 
     /**
-     * Creating a new stream filtering out null elements and applying map function on exist elements.
+     * Creating a new stream filtering out null elements and applying map function on each exist element.
      * @param stream
      * @param map
      * @param <T>
      * @param <R>
      * @return
      */
-    public static final <T, R> Stream<? super R> mapExistElements(Stream<T> stream, Function<T,R> map) {
+    public static final <T, R> Stream<? super R> mapEachExistElement(Stream<T> stream, Function<T,R> map) {
         return ITERABLE_ASSERTION.mapExistElements(stream, map);
     }
 
@@ -107,8 +107,8 @@ public final class NullSafe {
      * @param params the data params
      * @param action the function called when all data params exist
      */
-    public static final boolean allExistThen(Action action, Object... params) {
-        return COMPOSITE_NULL_SAFE.allExistThen(action, params);
+    public static final boolean ifAllExistThen(Action action, Object... params) {
+        return COMPOSITE_NULL_SAFE.ifAllExistThen(action, params);
     }
 
     /**
@@ -116,8 +116,8 @@ public final class NullSafe {
      * @param params the Optional params
      * @param action the function called when all Optional params are present
      */
-    public static final boolean allExistThenByOptional(Action action, Optional<?>... params) {
-        return COMPOSITE_NULL_SAFE.allExistThenByOptional(action, params);
+    public static final boolean ifAllExistThenByOptional(Action action, Optional<?>... params) {
+        return COMPOSITE_NULL_SAFE.ifAllExistThenByOptional(action, params);
     }
 
     /**
@@ -128,21 +128,12 @@ public final class NullSafe {
      *                          the keys of the OptionalValuePair which value not present will be passed as param
      * @param params the OptionalValuePair params
      */
-    public static <K> boolean allExistThenByOptional(Action noneOfNullAction,
+    public static <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
             Consumer<List<K>> someOfNullConsumer,
             OptionalValuePair<K, ?>... params) {
-        return COMPOSITE_NULL_SAFE.allExistThenByOptional(noneOfNullAction,
+        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElseByOptional(noneOfNullAction,
                 someOfNullConsumer,
                 params);
-    }
-
-
-    public static final <T1, T2> boolean allExistThen(T1 t1, T2 t2,
-            Action noneOfNullAction,
-            Action someIsNullAction) {
-        return COMPOSITE_NULL_SAFE.allExistThen(noneOfNullAction,
-                someIsNullAction,
-                t1, t2);
     }
 
     /**
@@ -154,10 +145,10 @@ public final class NullSafe {
      *                          param of the consumer is the key of null values
      * @param <K> the class of the key property
      */
-    public static <K> boolean allExistThen(Pair<K, ?> t1, Pair<K, ?> t2,
+    public static <K> boolean ifAllExistThen(Pair<K, ?> t1, Pair<K, ?> t2,
             Action noneOfNullAction,
             Consumer<List<K>> someOfNullConsumer) {
-        return COMPOSITE_NULL_SAFE.allExistThen(noneOfNullAction, someOfNullConsumer, t1, t2);
+        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElse(noneOfNullAction, someOfNullConsumer, t1, t2);
     }
 
     /**

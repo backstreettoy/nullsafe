@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -41,12 +40,12 @@ public final class CompositeNullSafe {
     }
 
     @SafeVarargs
-    public final boolean allExistThen(Action action, Object... params) {
-        return allExistThen(action, null, params);
+    public final boolean ifAllExistThen(Action action, Object... params) {
+        return ifAllExistThenOrElse(action, null, params);
     }
 
     @SafeVarargs
-    public final boolean allExistThen(Action noneOfNullAction,
+    public final boolean ifAllExistThenOrElse(Action noneOfNullAction,
             Action someIsNullAction,
             Object... params) {
         boolean paramNotNull = SINGLE_NULL_SAFE.notNullThen(params, null, someIsNullAction);
@@ -60,13 +59,13 @@ public final class CompositeNullSafe {
             pairs.add(Pair.of(paramIndex++, param));
         }
 
-        return allExistThen(noneOfNullAction,
+        return ifAllExistThenOrElse(noneOfNullAction,
                 x -> someIsNullAction.act(),
                 pairs.toArray(new Pair[]{}));
     }
 
     @SafeVarargs
-    public final <K> boolean allExistThen(Action noneOfNullAction,
+    public final <K> boolean ifAllExistThenOrElse(Action noneOfNullAction,
             Consumer<List<K>> someOfNullConsumer,
             Pair<K, ?>... params) {
         boolean paramExist = SINGLE_NULL_SAFE.notNullThen(params, null, () -> {
@@ -83,8 +82,7 @@ public final class CompositeNullSafe {
         return handleNullValueKeys(nullValueKeys, noneOfNullAction, someOfNullConsumer);
     }
 
-    public final boolean allExistThenByOptional(
-            Action action,
+    public final boolean ifAllExistThenByOptional(Action action,
             Optional<?>... params) {
         int paramIndex = 0;
         List<OptionalValuePair<Integer, ?>> pairs = new ArrayList<>(params.length);
@@ -92,11 +90,11 @@ public final class CompositeNullSafe {
             pairs.add(OptionalValuePair.of(paramIndex++, param));
         }
 
-        return allExistThenByOptional(action, null, pairs.toArray(new OptionalValuePair[]{}));
+        return ifAllExistThenOrElseByOptional(action, null, pairs.toArray(new OptionalValuePair[]{}));
     }
 
     @SafeVarargs
-    public final <K> boolean allExistThenByOptional(Action noneOfNullAction,
+    public final <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
             Consumer<List<K>> someOfNullConsumer,
             OptionalValuePair<K, ?>... params) {
         boolean paramExist = SINGLE_NULL_SAFE.notNullThen(params, null, () -> {
@@ -113,12 +111,23 @@ public final class CompositeNullSafe {
         return handleNullValueKeys(emptyOptionalKeys, noneOfNullAction, someOfNullConsumer);
     }
 
-    public <T1, T2, R> Optional<R> mapIfAllExistOrElse(T1 t1, T2 t2, Supplier<Optional<R>> map, R fallback) {
-        boolean allParamExist = allExistThen(null, null, t1, t2);
+    public <R> Optional<? super R> mapIfAllExistOrElse(Supplier<Optional<R>> map, R fallback, Object... params) {
+        boolean allParamExist = ifAllExistThenOrElse(null, null, params);
         if (allParamExist) {
             return map.get();
         } else {
             return Optional.ofNullable(fallback);
+        }
+    }
+
+    public <R> Optional<? super R> mapIfAllExistOrElseGet(Supplier<Optional<R>> map,
+            Supplier<Optional<? super R>> fallback,
+            Object... params) {
+        boolean allParamExist = ifAllExistThenOrElse(null, null, params);
+        if (allParamExist) {
+            return map.get();
+        } else {
+            return SINGLE_NULL_SAFE.isNull(fallback) ? Optional.empty() : fallback.get();
         }
     }
 
