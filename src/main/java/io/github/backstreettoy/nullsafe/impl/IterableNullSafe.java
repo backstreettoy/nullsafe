@@ -1,5 +1,6 @@
 package io.github.backstreettoy.nullsafe.impl;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public final class IterableNullSafe {
     }
 
     /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#mapExistElements(Stream, Function)
+     * @see io.github.backstreettoy.nullsafe.NullSafe#mapEachExistElement(Stream, Function)
      */
     public <T, R> Stream<? super R> mapExistElements(Stream<T> stream, Function<T,R> map) {
         if (SINGLE_NULL_SAFE.isNull(stream)) {
@@ -46,6 +47,37 @@ public final class IterableNullSafe {
             throw new NullPointerException("map function must not be null");
         }
         return stream.filter(x -> !SINGLE_NULL_SAFE.isNull(x))
-                .map(map::apply);
+                .map(map);
+    }
+
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#coalesce(Object[])
+     */
+    @SafeVarargs
+    public final <T> Optional<? super T> coalesce(T... params) {
+        if (SINGLE_NULL_SAFE.isNull(params)) {
+            return Optional.empty();
+        }
+        for (T param : params) {
+            if (!SINGLE_NULL_SAFE.isNull(param)) {
+                return Optional.of(param);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#coalesce(Iterable)
+     */
+    public final <T> Optional<? super T> coalesce(Iterable<T> iterable) {
+        if (SINGLE_NULL_SAFE.isNull(iterable)) {
+            return Optional.empty();
+        }
+        for (T param : iterable) {
+            if (!SINGLE_NULL_SAFE.isNull(param)) {
+                return Optional.of(param);
+            }
+        }
+        return Optional.empty();
     }
 }

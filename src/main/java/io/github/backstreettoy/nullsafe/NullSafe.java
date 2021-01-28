@@ -2,7 +2,6 @@ package io.github.backstreettoy.nullsafe;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -12,7 +11,6 @@ import io.github.backstreettoy.nullsafe.functions.Action;
 import io.github.backstreettoy.nullsafe.impl.CompositeNullSafe;
 import io.github.backstreettoy.nullsafe.impl.IterableNullSafe;
 import io.github.backstreettoy.nullsafe.impl.OptionalValuePair;
-import io.github.backstreettoy.nullsafe.impl.Pair;
 import io.github.backstreettoy.nullsafe.impl.SingleNullSafe;
 
 /**
@@ -92,14 +90,34 @@ public final class NullSafe {
 
     /**
      * Creating a new stream filtering out null elements and applying map function on each exist element.
-     * @param stream
-     * @param map
-     * @param <T>
-     * @param <R>
-     * @return
+     * @param stream the input stream
+     * @param map the map function
+     * @param <T> the type of input stream class
+     * @param <R> the type of return stream class
+     * @return a stream of type R
      */
     public static final <T, R> Stream<? super R> mapEachExistElement(Stream<T> stream, Function<T,R> map) {
         return ITERABLE_ASSERTION.mapExistElements(stream, map);
+    }
+
+    /**
+     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
+     * @param params the params
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public static final <T> Optional<? super T> coalesce(T... params) {
+        return ITERABLE_ASSERTION.coalesce(params);
+    }
+
+    /**
+     * Return a optional contains the first not null param in iterable. Optional will be empty if none of params exists.
+     * @param iterable the iterable collection
+     * @param <T> the class of the param
+     * @return Optional
+     */
+    public static final <T> Optional<? super T> coalesce(Iterable<T> iterable) {
+        return ITERABLE_ASSERTION.coalesce(iterable);
     }
 
     /**
@@ -121,145 +139,57 @@ public final class NullSafe {
     }
 
     /**
-     * Invoking the noneOfNullAction function if all Optional params are present,
-     * someOfNullConsumer function otherwise.
+     * Invoke the noneOfNullAction function if all Optional params are present,
+     * anyIsNullConsumer function otherwise.
      * @param noneOfNullAction the function called when all Optional params are present
-     * @param someOfNullConsumer the function called when some Optional params is not present,
+     * @param anyIsNullConsumer the function called when some Optional params is not present,
      *                          the keys of the OptionalValuePair which value not present will be passed as param
      * @param params the OptionalValuePair params
      */
     public static <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
-            Consumer<List<K>> someOfNullConsumer,
+            Consumer<List<K>> anyIsNullConsumer,
             OptionalValuePair<K, ?>... params) {
         return COMPOSITE_NULL_SAFE.ifAllExistThenOrElseByOptional(noneOfNullAction,
-                someOfNullConsumer,
+                anyIsNullConsumer,
                 params);
     }
 
     /**
-     * Applying noneOfNullAction if all data params are not null, otherwise someOfNullConsumer function applied.
-     * @param t1 param t1
-     * @param t2 param t2
+     * Invoke the noneOfNullAction if all data params are not null, otherwise anyIsNullAction function invoked.
      * @param noneOfNullAction not required, the function called when all data params are not null
-     * @param someOfNullConsumer not required, the function called when any of data params is null,
+     * @param anyIsNullAction not required, the function called when any of data params is null,
      *                          param of the consumer is the key of null values
-     * @param <K> the class of the key property
      */
-    public static <K> boolean ifAllExistThen(Pair<K, ?> t1, Pair<K, ?> t2,
-            Action noneOfNullAction,
-            Consumer<List<K>> someOfNullConsumer) {
-        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElse(noneOfNullAction, someOfNullConsumer, t1, t2);
+    public final boolean ifAllExistThenOrElse(Action noneOfNullAction,
+            Action anyIsNullAction,
+            Object... params) {
+        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElse(noneOfNullAction, anyIsNullAction, params);
     }
 
     /**
-     * Invoke map function if both t1 and t2 are not null, otherwise just return fallback value
-     * @param t1 param t1
-     * @param t2 param t2
+     * Invoke map function if all data params are not null and return the return result of map function,
+     * otherwise just return the fallback value.
      * @param map the map function
      * @param fallback the fallback value returned if any of t1 and t2 is null
-     * @param <T1> the class of t1
-     * @param <T2> the class of t2
      * @param <R> the class of return type
      * @return value of type R result from map function result or fallback value
      */
-    public static final <T1, T2, R> R mapIfAllExistOrElse(T1 t1, T2 t2, BiFunction<T1, T2, R> map, R fallback) {
-        COMPOSITE_NULL_SAFE.mapIfAllExistOrElse()
+    public static <R> Optional<? super R> mapIfAllExistOrElse(Supplier<Optional<R>> map, R fallback, Object... params) {
+        return COMPOSITE_NULL_SAFE.mapIfAllExistOrElse(map, fallback, params);
     }
 
     /**
-     * Invoke map function if both t1 and t2 are not null, otherwise invoke fallback function
-     * @param t1 param t1
-     * @param t2 param t2
+     * Invoke map function if all data params are not null and return the return result of map function,
+     * otherwise invoke fallback function and return the result of fallback function.
      * @param map the map function
      * @param fallback the fallback function called if any of t1 and t2 is null, if this param is null then return null
-     * @param <T1> the class of t1
-     * @param <T2> the class of t2
      * @param <R> the class of return type
      * @return value of type R result from map function result or fallback function
      */
-    public static final <T1, T2, R> R mapIfAllExistOrElseGet(T1 t1, T2 t2, BiFunction<T1, T2, R> map, Supplier<R> fallback) {
-        return null;
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public static final <T> Optional<? super T> coalesce(T t1, T t2) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2);
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param t3 third param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public <T> Optional<? super T> coalesce(T t1, T t2, T t3) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3);
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param t3 third param
-     * @param t4 forth param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4);
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param t3 third param
-     * @param t4 forth param
-     * @param t5 fifth param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5);
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param t3 third param
-     * @param t4 forth param
-     * @param t5 fifth param
-     * @param t6 sixth param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5, T t6) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5, t6);
-    }
-
-    /**
-     * Return a optional contains the first not null param. Optional will be empty if none of params exists.
-     * @param t1 first param
-     * @param t2 second param
-     * @param t3 third param
-     * @param t4 forth param
-     * @param t5 fifth param
-     * @param t6 sixth param
-     * @param t7 seventh param
-     * @param <T> the class of the param
-     * @return Optional
-     */
-    public <T> Optional<? super T> coalesce(T t1, T t2, T t3, T t4, T t5, T t6, T t7) {
-        return COMPOSITE_NULL_SAFE.coalesce(t1, t2, t3, t4, t5, t6, t7);
+    public <R> Optional<? super R> mapIfAllExistOrElseGet(Supplier<Optional<R>> map,
+            Supplier<Optional<? super R>> fallback,
+            Object... params) {
+        return COMPOSITE_NULL_SAFE.mapIfAllExistOrElseGet(map, fallback, params);
     }
 
 }

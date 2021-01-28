@@ -23,22 +23,6 @@ public final class CompositeNullSafe {
         return INSTANCE;
     }
 
-    /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#coalesce(Object, Object)
-     */
-    @SafeVarargs
-    public final <T> Optional<? super T> coalesce(T... params) {
-        if (SINGLE_NULL_SAFE.isNull(params)) {
-            return Optional.empty();
-        }
-        for (T param : params) {
-            if (!SINGLE_NULL_SAFE.isNull(param)) {
-                return Optional.of(param);
-            }
-        }
-        return Optional.empty();
-    }
-
     @SafeVarargs
     public final boolean ifAllExistThen(Action action, Object... params) {
         return ifAllExistThenOrElse(action, null, params);
