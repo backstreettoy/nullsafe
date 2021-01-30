@@ -66,7 +66,7 @@ public final class NullSafe {
      * @return boolean indicate if obj is exist
      */
     public static <T> boolean notNullThenOrElse(T obj, Consumer<T> notNullAction, Action nullAction) {
-        return SINGLE_ASSERTION.notNullThen(obj, notNullAction, nullAction);
+        return SINGLE_ASSERTION.notNullThenOrElse(obj, notNullAction, nullAction);
     }
 
     /**

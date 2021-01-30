@@ -47,7 +47,7 @@ public class SingleNullSafeTest {
     public void testNotNullThenWithNullAction() {
         Action whenNullAction = mock(Action.class);
         Consumer notNullConsumer = mock(Consumer.class);
-        boolean notNull = singleNullSafe.notNullThen(null, notNullConsumer, whenNullAction);
+        boolean notNull = singleNullSafe.notNullThenOrElse(null, notNullConsumer, whenNullAction);
         assertThat(notNull).isFalse();
         verify(whenNullAction, times(1)).act();
     }
@@ -56,9 +56,9 @@ public class SingleNullSafeTest {
     public void testNotNullThenNullActionIsNull() {
         Consumer mockConsumer = mock(Consumer.class);
         try {
-            singleNullSafe.notNullThen(null, mockConsumer, null);
+            singleNullSafe.notNullThenOrElse(null, mockConsumer, null);
         } catch (NullPointerException e) {
-            Assertions.fail("shoud allow null action is null");
+            Assertions.fail("shoud allow nullAction is null");
         }
     }
 

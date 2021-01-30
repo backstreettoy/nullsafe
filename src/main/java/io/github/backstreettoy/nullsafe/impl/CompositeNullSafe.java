@@ -42,7 +42,7 @@ public final class CompositeNullSafe {
     public final boolean ifAllExistThenOrElse(Action noneOfNullAction,
             Action anyIsNullAction,
             Object... params) {
-        boolean paramNotNull = SINGLE_NULL_SAFE.notNullThen(params, null, anyIsNullAction);
+        boolean paramNotNull = SINGLE_NULL_SAFE.notNullThenOrElse(params, null, anyIsNullAction);
         if (!paramNotNull) {
             return false;
         }
@@ -54,7 +54,7 @@ public final class CompositeNullSafe {
         }
 
         return ifAllExistThenOrElse(noneOfNullAction,
-                x -> anyIsNullAction.act(),
+                x -> SINGLE_NULL_SAFE.notNullThen(anyIsNullAction, action -> action.act()),
                 pairs.toArray(new Pair[]{}));
     }
 
@@ -65,7 +65,7 @@ public final class CompositeNullSafe {
     public final <K> boolean ifAllExistThenOrElse(Action noneOfNullAction,
             Consumer<List<K>> anyIsNullConsumer,
             Pair<K, ?>... params) {
-        boolean paramExist = SINGLE_NULL_SAFE.notNullThen(params, null, () -> {
+        boolean paramExist = SINGLE_NULL_SAFE.notNullThenOrElse(params, null, () -> {
             SINGLE_NULL_SAFE.notNullThen(anyIsNullConsumer, x -> x.accept(Collections.emptyList()));
         });
         if (!paramExist) {
@@ -73,7 +73,8 @@ public final class CompositeNullSafe {
         }
 
         List<K> nullValueKeys = Stream.of(params)
-                .filter(x -> SINGLE_NULL_SAFE.isNull(x))
+                .filter(x -> !SINGLE_NULL_SAFE.isNull(x) && !SINGLE_NULL_SAFE.isNull(x.getKey()))
+                .filter(x -> SINGLE_NULL_SAFE.isNull(x.getValue()))
                 .map(x -> x.getKey())
                 .collect(Collectors.toList());
         return handleNullValueKeys(nullValueKeys, noneOfNullAction, anyIsNullConsumer);
@@ -150,10 +151,10 @@ public final class CompositeNullSafe {
             Action noneOfNullAction,
             Consumer<List<K>> anyIsNullConsumer) {
         if (keys.isEmpty()) {
-            noneOfNullAction.act();
+            SINGLE_NULL_SAFE.notNullThen(noneOfNullAction, x -> x.act());
             return true;
         } else {
-            anyIsNullConsumer.accept(keys);
+            SINGLE_NULL_SAFE.notNullThen(anyIsNullConsumer, x -> x.accept(keys));
             return false;
         }
     }

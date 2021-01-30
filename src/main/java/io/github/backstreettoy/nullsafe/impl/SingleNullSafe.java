@@ -27,13 +27,13 @@ public final class SingleNullSafe {
      */
     public final <T> boolean notNullThen(T obj, Consumer<T> action) {
         Optional.ofNullable(action).orElseThrow(() -> new NullPointerException("action function must not be null"));
-        return notNullThen(obj, action, null);
+        return notNullThenOrElse(obj, action, null);
     }
 
     /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer)
+     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThenOrElse(Object, Consumer, Action)
      */
-    public final <T> boolean notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
+    public final <T> boolean notNullThenOrElse(T obj, Consumer<T> notNullAction, Action nullAction) {
         boolean notNull = !isNull(obj);
         if (notNull) {
             if (!isNull(notNullAction)) {
@@ -63,7 +63,7 @@ public final class SingleNullSafe {
             throw new NullPointerException("optional must not be null");
         }
         T value = optional.orElse(null);
-        return notNullThen(value, notNullAction, nullAction);
+        return notNullThenOrElse(value, notNullAction, nullAction);
     }
 
     public final <T, R> Optional<? super R> mapNotNull(T obj, Function<T, Optional<R>> map) {
