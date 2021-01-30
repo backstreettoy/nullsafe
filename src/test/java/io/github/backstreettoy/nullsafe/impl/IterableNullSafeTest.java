@@ -3,6 +3,7 @@ package io.github.backstreettoy.nullsafe.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
  * @author backstreettoy
  */
 public class IterableNullSafeTest {
-    private static final IterableNullSafe ITERABLE_ASSERTION = IterableNullSafe.getInstance();
+    private static final IterableNullSafe INSTANCE = IterableNullSafe.getInstance();
 
     @Test
     public void testNotNullElementsThen() {
@@ -34,7 +35,7 @@ public class IterableNullSafeTest {
 
         Consumer mockConsumer = mock(Consumer.class);
 
-        ITERABLE_ASSERTION.notNullElementsThen(list, mockConsumer);
+        INSTANCE.notNullElementsThen(list, mockConsumer);
         ArgumentCaptor<Float> captor = ArgumentCaptor.forClass(Float.class);
         verify(mockConsumer, times(1)).accept(captor.capture());
         List<Float> capturedValues = captor.getAllValues();
@@ -43,12 +44,12 @@ public class IterableNullSafeTest {
 
     @Test(expected = NullPointerException.class)
     public void testNotNullElementsThenNoIterable() {
-        ITERABLE_ASSERTION.notNullElementsThen(null, mock(Consumer.class));
+        INSTANCE.notNullElementsThen(null, mock(Consumer.class));
     }
 
     @Test(expected = NullPointerException.class)
     public void testNotNullElementsThenNoConsumer() {
-        ITERABLE_ASSERTION.notNullElementsThen(Collections.singletonList(1), null);
+        INSTANCE.notNullElementsThen(Collections.singletonList(1), null);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class IterableNullSafeTest {
         Function mockFunction = mock(Function.class);
         when(mockFunction.apply(anyObject())).thenReturn("RESULT");
 
-        Stream<String> stream = ITERABLE_ASSERTION.mapExistElements(list.stream(), mockFunction);
+        Stream<String> stream = INSTANCE.mapExistElements(list.stream(), mockFunction);
         List<String> resultList = stream.collect(Collectors.toList());
         verify(mockFunction, times(1)).apply(anyObject());
         assertThat(resultList).hasSize(1).containsExactly("RESULT");
@@ -68,11 +69,32 @@ public class IterableNullSafeTest {
 
     @Test(expected = NullPointerException.class)
     public void testMapNotNullElementsNoStream() {
-        ITERABLE_ASSERTION.mapExistElements(null, mock(Function.class));
+        INSTANCE.mapExistElements(null, mock(Function.class));
     }
 
     @Test(expected = NullPointerException.class)
     public void testNotNullElementsThenNoFunction() {
-        ITERABLE_ASSERTION.mapExistElements(Collections.singletonList(1).stream(), null);
+        INSTANCE.mapExistElements(Collections.singletonList(1).stream(), null);
+    }
+
+    @Test
+    public void testCoalesce() {
+        Optional<? super Object> optional = INSTANCE.coalesce();
+        assertThat(optional.isPresent()).isFalse();
+
+        optional = INSTANCE.coalesce(1);
+        assertThat(optional.isPresent()).isTrue();
+        assertThat(optional.get()).isEqualTo(1);
+
+        optional = INSTANCE.coalesce((Object)null);
+        assertThat(optional.isPresent()).isFalse();
+
+        optional = INSTANCE.coalesce(null, 1);
+        assertThat(optional.isPresent()).isTrue();
+        assertThat(optional.get()).isEqualTo(1);
+
+        optional = INSTANCE.coalesce(null, 1, null, 2, null);
+        assertThat(optional.isPresent()).isTrue();
+        assertThat(optional.get()).isEqualTo(1);
     }
 }

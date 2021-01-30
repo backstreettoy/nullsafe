@@ -22,9 +22,6 @@ public final class IterableNullSafe {
      * @see io.github.backstreettoy.nullsafe.NullSafe#notNullElementsThen(Iterable, Consumer)
      */
     public <T> void notNullElementsThen(Iterable<T> iterable, Consumer<T> action) {
-        if (SINGLE_NULL_SAFE.isNull(iterable)) {
-            throw new NullPointerException("iterable must not be null");
-        }
         if (SINGLE_NULL_SAFE.isNull(action)) {
             throw new NullPointerException("action must not be null");
         }

@@ -98,18 +98,18 @@ public class SingleNullSafeTest {
     public void testMapNotNull() {
         Function mockFunction = mock(Function.class);
         Float mockResult = new Float(Math.random());
-        when(mockFunction.apply(anyObject())).thenReturn(mockResult);
-        Optional result = singleNullSafe.mapNotNull(new Object(), mockFunction);
+        when(mockFunction.apply(anyObject())).thenReturn(Optional.of(mockResult));
+        Optional<Float> result = singleNullSafe.mapNotNull(new Object(), mockFunction);
         assertThat(result).isNotNull();
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).isEqualTo(mockResult);
     }
 
     @Test
-    public void testMapNotNullMapAsNull() {
+    public void testMapNotNullMapAsEmpty() {
         Function mockFunction = mock(Function.class);
-        when(mockFunction.apply(anyObject())).thenReturn(null);
-        Optional result = singleNullSafe.mapNotNull(new Object(), mockFunction);
+        when(mockFunction.apply(anyObject())).thenReturn(Optional.empty());
+        Optional<Object> result = singleNullSafe.mapNotNull(new Object(), mockFunction);
         assertThat(result).isNotNull();
         assertThat(result.isPresent()).isFalse();
     }

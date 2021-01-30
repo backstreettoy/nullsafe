@@ -23,17 +23,15 @@ public final class SingleNullSafe {
     }
 
     /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer, Action)
+     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer)
      */
     public final <T> boolean notNullThen(T obj, Consumer<T> action) {
-        if (isNull(action)) {
-            throw new NullPointerException("action must not be null");
-        }
+        Optional.ofNullable(action).orElseThrow(() -> new NullPointerException("action function must not be null"));
         return notNullThen(obj, action, null);
     }
 
     /**
-     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer, Action)
+     * @see io.github.backstreettoy.nullsafe.NullSafe#notNullThen(Object, Consumer)
      */
     public final <T> boolean notNullThen(T obj, Consumer<T> notNullAction, Action nullAction) {
         boolean notNull = !isNull(obj);
@@ -68,13 +66,13 @@ public final class SingleNullSafe {
         return notNullThen(value, notNullAction, nullAction);
     }
 
-    public final <T, R> Optional<? super R> mapNotNull(T obj, Function<T, R> map) {
+    public final <T, R> Optional<? super R> mapNotNull(T obj, Function<T, Optional<R>> map) {
         if (isNull(map)) {
             throw new NullPointerException("map must not be null");
         }
         if (isNull(obj)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(map.apply(obj));
+        return map.apply(obj);
     }
 }

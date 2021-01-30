@@ -18,21 +18,31 @@ import io.github.backstreettoy.nullsafe.functions.Action;
 public final class CompositeNullSafe {
     private static final CompositeNullSafe INSTANCE = new CompositeNullSafe();
     private static final SingleNullSafe SINGLE_NULL_SAFE = SingleNullSafe.getInstance();
+    private static final IterableNullSafe ITERABLE_NULL_SAFE = IterableNullSafe.getInstance();
 
     public static CompositeNullSafe getInstance() {
         return INSTANCE;
     }
 
+    private CompositeNullSafe() {}
+
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#ifAllExistThen(Action, Object...)
+     */
     @SafeVarargs
     public final boolean ifAllExistThen(Action action, Object... params) {
+        Optional.ofNullable(action).orElseThrow(() -> new NullPointerException("action function must not be null"));
         return ifAllExistThenOrElse(action, null, params);
     }
 
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#ifAllExistThenOrElse(Action, Action, Object...)
+     */
     @SafeVarargs
     public final boolean ifAllExistThenOrElse(Action noneOfNullAction,
-            Action someIsNullAction,
+            Action anyIsNullAction,
             Object... params) {
-        boolean paramNotNull = SINGLE_NULL_SAFE.notNullThen(params, null, someIsNullAction);
+        boolean paramNotNull = SINGLE_NULL_SAFE.notNullThen(params, null, anyIsNullAction);
         if (!paramNotNull) {
             return false;
         }
@@ -44,16 +54,19 @@ public final class CompositeNullSafe {
         }
 
         return ifAllExistThenOrElse(noneOfNullAction,
-                x -> someIsNullAction.act(),
+                x -> anyIsNullAction.act(),
                 pairs.toArray(new Pair[]{}));
     }
 
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#ifAllExistThenOrElse(Action, Consumer, Pair[])
+     */
     @SafeVarargs
     public final <K> boolean ifAllExistThenOrElse(Action noneOfNullAction,
-            Consumer<List<K>> someOfNullConsumer,
+            Consumer<List<K>> anyIsNullConsumer,
             Pair<K, ?>... params) {
         boolean paramExist = SINGLE_NULL_SAFE.notNullThen(params, null, () -> {
-            SINGLE_NULL_SAFE.notNullThen(someOfNullConsumer, x -> x.accept(Collections.emptyList()));
+            SINGLE_NULL_SAFE.notNullThen(anyIsNullConsumer, x -> x.accept(Collections.emptyList()));
         });
         if (!paramExist) {
             return false;
@@ -63,11 +76,16 @@ public final class CompositeNullSafe {
                 .filter(x -> SINGLE_NULL_SAFE.isNull(x))
                 .map(x -> x.getKey())
                 .collect(Collectors.toList());
-        return handleNullValueKeys(nullValueKeys, noneOfNullAction, someOfNullConsumer);
+        return handleNullValueKeys(nullValueKeys, noneOfNullAction, anyIsNullConsumer);
     }
 
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#ifAllExistThenByOptional(Action, Optional[])
+     */
+    @SafeVarargs
     public final boolean ifAllExistThenByOptional(Action action,
             Optional<?>... params) {
+        Optional.ofNullable(action).orElseThrow(() -> new NullPointerException("action function must not be null"));
         int paramIndex = 0;
         List<OptionalValuePair<Integer, ?>> pairs = new ArrayList<>(params.length);
         for (Optional<?> param : params) {
@@ -77,14 +95,16 @@ public final class CompositeNullSafe {
         return ifAllExistThenOrElseByOptional(action, null, pairs.toArray(new OptionalValuePair[]{}));
     }
 
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#ifAllExistThenOrElseByOptional(Action, Consumer, OptionalValuePair[])
+     */
     @SafeVarargs
     public final <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
-            Consumer<List<K>> someOfNullConsumer,
+            Consumer<List<K>> anyIsNullConsumer,
             OptionalValuePair<K, ?>... params) {
-        boolean paramExist = SINGLE_NULL_SAFE.notNullThen(params, null, () -> {
-            SINGLE_NULL_SAFE.notNullThen(someOfNullConsumer, x -> x.accept(Collections.emptyList()));
-        });
+        boolean paramExist = SINGLE_NULL_SAFE.isNull(params);
         if (!paramExist) {
+            anyIsNullConsumer.accept(Collections.EMPTY_LIST);
             return false;
         }
 
@@ -92,10 +112,14 @@ public final class CompositeNullSafe {
                 .filter(x -> SINGLE_NULL_SAFE.isNull(x) || !x.getOptionalValue().isPresent())
                 .map(x -> x.getKey())
                 .collect(Collectors.toList());
-        return handleNullValueKeys(emptyOptionalKeys, noneOfNullAction, someOfNullConsumer);
+        return handleNullValueKeys(emptyOptionalKeys, noneOfNullAction, anyIsNullConsumer);
     }
 
-    public <R> Optional<? super R> mapIfAllExistOrElse(Supplier<Optional<R>> map, R fallback, Object... params) {
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#mapIfAllExistOrElse(Supplier, Object, Object...)
+     */
+    @SafeVarargs
+    public final <R> Optional<? super R> mapIfAllExistOrElse(Supplier<Optional<R>> map, R fallback, Object... params) {
         boolean allParamExist = ifAllExistThenOrElse(null, null, params);
         if (allParamExist) {
             return map.get();
@@ -104,25 +128,32 @@ public final class CompositeNullSafe {
         }
     }
 
+    /**
+     * @see io.github.backstreettoy.nullsafe.NullSafe#mapIfAllExistOrElseGet(Supplier, Supplier, Object...)
+     */
     public <R> Optional<? super R> mapIfAllExistOrElseGet(Supplier<Optional<R>> map,
             Supplier<Optional<? super R>> fallback,
             Object... params) {
+        Optional.ofNullable(map)
+                .orElseThrow(() -> new NullPointerException("map function must not be null"));
+        Optional.ofNullable(fallback)
+                .orElseThrow(() -> new NullPointerException("fallback function must not be null"));
         boolean allParamExist = ifAllExistThenOrElse(null, null, params);
         if (allParamExist) {
             return map.get();
         } else {
-            return SINGLE_NULL_SAFE.isNull(fallback) ? Optional.empty() : fallback.get();
+            return fallback.get();
         }
     }
 
     private <K> boolean handleNullValueKeys(List<K> keys,
             Action noneOfNullAction,
-            Consumer<List<K>> someOfNullConsumer) {
+            Consumer<List<K>> anyIsNullConsumer) {
         if (keys.isEmpty()) {
             noneOfNullAction.act();
             return true;
         } else {
-            someOfNullConsumer.accept(keys);
+            anyIsNullConsumer.accept(keys);
             return false;
         }
     }
