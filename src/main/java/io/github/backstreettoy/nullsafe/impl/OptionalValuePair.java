@@ -24,6 +24,9 @@ public class OptionalValuePair<K, V> {
 
 
     private OptionalValuePair(K key, Optional<V> value) {
+        if (key == null) {
+            throw new NullPointerException("key must not be null");
+        }
         this.key = key;
         this.optionalValue = value;
     }

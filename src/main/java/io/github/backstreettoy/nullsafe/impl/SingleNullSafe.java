@@ -18,8 +18,19 @@ public final class SingleNullSafe {
         return INSTANCE;
     }
 
-    public final boolean isNull(Object obj) {
+    final boolean isNull(Object obj) {
         return obj == null;
+    }
+
+    final boolean isOptionalEmpty(Optional<?> optional) {
+        return optional == null || !optional.isPresent();
+    }
+
+    final boolean isPairEmpty(Pair<?, ?> pair) {
+        return pair == null || pair.getValue() == null;
+    }
+    final boolean isOptionalValuePairEmpty(OptionalValuePair<?, ?> pair) {
+        return pair == null || pair.getOptionalValue() == null || !pair.getOptionalValue().isPresent();
     }
 
     /**

@@ -154,7 +154,7 @@ public final class NullSafe {
     public static final <K> boolean ifAllExistThenOrElse(Action noneOfNullAction,
             Consumer<List<K>> anyIsNullAction,
             Pair<K, ?>... params) {
-        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElse(noneOfNullAction, anyIsNullAction, params);
+        return COMPOSITE_NULL_SAFE.namedIfAllExistThenOrElse(noneOfNullAction, anyIsNullAction, params);
     }
 
     /**
@@ -180,7 +180,7 @@ public final class NullSafe {
     public static <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
             Consumer<List<K>> anyIsNullConsumer,
             OptionalValuePair<K, ?>... params) {
-        return COMPOSITE_NULL_SAFE.ifAllExistThenOrElseByOptional(noneOfNullAction,
+        return COMPOSITE_NULL_SAFE.namedIfAllExistThenOrElseByOptional(noneOfNullAction,
                 anyIsNullConsumer,
                 params);
     }

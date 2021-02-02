@@ -18,11 +18,14 @@ public class Pair<K, V> {
      * @return Pair instance
      */
     public static <K, V> Pair<K, V> of(K key, V value) {
-        return new Pair(key, value);
+        return new Pair<>(key, value);
     }
 
 
     private Pair(K key, V value) {
+        if (key == null) {
+            throw new NullPointerException("key must not be null");
+        }
         this.key = key;
         this.value = value;
     }
