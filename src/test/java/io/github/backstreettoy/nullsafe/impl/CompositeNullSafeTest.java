@@ -132,8 +132,8 @@ public class CompositeNullSafeTest {
         assertThat(nullValueKeys).containsExactly("X", "D");
 
         // only one null
-        mockNoneIsNullAction = mock(Action.class);
-        mockAnyIsNullConsumer = mock(Consumer.class);
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
         allExist = INSTANCE.namedIfAllExistThenOrElse(
                 mockNoneIsNullAction, mockAnyIsNullConsumer,
                 null);
@@ -172,6 +172,136 @@ public class CompositeNullSafeTest {
         INSTANCE.namedIfAllExistThenOrElse(
                 mockNoneIsNullAction, mockAnyIsNullConsumer);
         Assertions.fail("Should not execute to here");
+    }
+
+    @Test
+    public void testNamedIfAllExistThenOrElseByOptional_HasNullOrEmpty() {
+        Action mockNoneIsNullAction = mock(Action.class);
+        Consumer mockAnyIsNullConsumer = mock(Consumer.class);
+
+        // null value exist
+        boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.of(1)), null, OptionalValuePair.of("X", Optional.empty()),
+                OptionalValuePair.of("C", Optional.of(new Object())), OptionalValuePair.of("D", (Optional)null));
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        ArgumentCaptor<List> anyIsNullParamCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockAnyIsNullConsumer, times(1)).accept(anyIsNullParamCaptor.capture());
+        List<String> nullValueKeys = anyIsNullParamCaptor.getValue();
+        assertThat(nullValueKeys).containsExactly("X", "D");
+
+        // only one null
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                null);
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        verify(mockAnyIsNullConsumer, times(1)).accept(anyObject());
+
+        // two null
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                null, null);
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        verify(mockAnyIsNullConsumer, times(1)).accept(anyObject());
+
+        // empty value
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.empty()));
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        anyIsNullParamCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockAnyIsNullConsumer, times(1)).accept(anyIsNullParamCaptor.capture());
+        nullValueKeys = anyIsNullParamCaptor.getValue();
+        assertThat(nullValueKeys).containsExactly("A");
+
+        // empty value and null value
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.empty()), OptionalValuePair.of("B", null), null);
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        anyIsNullParamCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockAnyIsNullConsumer, times(1)).accept(anyIsNullParamCaptor.capture());
+        nullValueKeys = anyIsNullParamCaptor.getValue();
+        assertThat(nullValueKeys).containsExactly("A", "B");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNamedIfAllExistThenOrElseByOptional_KeyIsNull() {
+        Action mockNoneIsNullAction = mock(Action.class);
+        Consumer mockAnyIsNullConsumer = mock(Consumer.class);
+        boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of(null, Optional.of(1f)));
+        Assertions.fail("should not execute to here!");
+    }
+
+    @Test
+    public void testNamedIfAllExistThenOrElseByOptional_AllExist() {
+        Action mockNoneIsNullAction = mock(Action.class);
+        Consumer mockAnyIsNullConsumer = mock(Consumer.class);
+        // many value with different types
+        boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.of(1f)),
+                OptionalValuePair.of("B", Optional.of(new Object())),
+                OptionalValuePair.of("C", Optional.of(new Object[]{})),
+                OptionalValuePair.of("D", Optional.of(Collections.EMPTY_LIST)));
+        assertThat(allExist).isTrue();
+        verify(mockNoneIsNullAction, times(1)).act();
+        verify(mockAnyIsNullConsumer, never()).accept(anyObject());
+
+        // just one value
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullConsumer);
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.of(1f)));
+        assertThat(allExist).isTrue();
+        verify(mockNoneIsNullAction, times(1)).act();
+        verify(mockAnyIsNullConsumer, never()).accept(anyObject());
+    }
+
+    @Test
+    public void testNamedIfAllExistThenOrElseByOptional_CallbackIsNull() {
+        Action mockNoneIsNullAction = mock(Action.class);
+        Consumer mockAnyIsNullConsumer = mock(Consumer.class);
+
+        boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                null, mockAnyIsNullConsumer,
+                OptionalValuePair.of("A", Optional.of(1f)),
+                OptionalValuePair.of("B", Optional.of(new Object())),
+                OptionalValuePair.of("C", Optional.of(new Object[]{})),
+                OptionalValuePair.of("D", Optional.of(Collections.EMPTY_LIST)));
+        assertThat(allExist).isTrue();
+
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, null,
+                OptionalValuePair.of("A", Optional.of(1f)),
+                OptionalValuePair.of("B", Optional.of(new Object())),
+                OptionalValuePair.of("C", Optional.of(new Object[]{})),
+                OptionalValuePair.of("D", Optional.of(Collections.EMPTY_LIST)));
+        assertThat(allExist).isTrue();
+
+        allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
+                null, null,
+                OptionalValuePair.of("A", Optional.of(1f)),
+                OptionalValuePair.of("B", Optional.of(new Object())),
+                OptionalValuePair.of("C", Optional.of(new Object[]{})),
+                OptionalValuePair.of("D", Optional.of(Collections.EMPTY_LIST)));
+        assertThat(allExist).isTrue();
     }
 
     @Test
