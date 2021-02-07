@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import io.github.backstreettoy.nullsafe.functions.Action;
 import org.assertj.core.api.Assertions;
@@ -28,12 +29,22 @@ public class CompositeNullSafeTest {
     private CompositeNullSafe INSTANCE = CompositeNullSafe.getInstance();
 
     @Test
-    public void testIfAllExistThen_AllExist() {
+    public void testIfAllExistThen_ParamVariables() {
         Action mockAction = mock(Action.class);
 
         boolean allExist = INSTANCE.ifAllExistThen(mockAction, 1, 2, 3);
         assertThat(allExist).isTrue();
         verify(mockAction, Mockito.timeout(1)).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThen(mockAction, null);
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThen(mockAction, null, null);
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
     }
 
     @Test(expected = NullPointerException.class)
@@ -51,25 +62,6 @@ public class CompositeNullSafeTest {
     }
 
     @Test
-    public void testIfAllExistThen_NotAllExist() {
-        Action mockAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThen(mockAction, null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThen(mockAction, 1, null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThen(mockAction, null, null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-    }
-
-    @Test
     public void testIfAllExistThen_DifferentType() {
         Action mockAction = mock(Action.class);
 
@@ -84,16 +76,63 @@ public class CompositeNullSafeTest {
     }
 
     @Test
-    public void testIfAllExistThenOrElse() {
+    public void testIfAllExistThenByOptional_VariableParams() {
+        Action mockAction = mock(Action.class);
+
+        boolean allExist = INSTANCE.ifAllExistThenByOptional(mockAction,
+                Optional.of(1), Optional.of(2), Optional.of(3));
+        assertThat(allExist).isTrue();
+        verify(mockAction, Mockito.timeout(1)).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, null);
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, Optional.of(1), null);
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, null, null);
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
+
+        reset(mockAction);
+        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, Optional.of(1), Optional.empty());
+        assertThat(allExist).isFalse();
+        verify(mockAction, never()).act();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testIfAllExistThenByOptional_Actions() {
+        boolean allExist = INSTANCE.ifAllExistThenByOptional(null,
+                Optional.of(1), Optional.of(2), Optional.of(3));
+        Assertions.fail("Should not execute here");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIfAllExistThenByOptional_NoneOfParam() {
+        Action mockAction = mock(Action.class);
+
+        boolean allExist = INSTANCE.ifAllExistThen(mockAction);
+        Assertions.fail("Shoud not execute to here!");
+    }
+
+    @Test
+    public void testIfAllExistThenOrElse_ParamVariables() {
         Action mockNoneIsNullAction = mock(Action.class);
         Action mockAnyIsNullAction = mock(Action.class);
 
+        // some params are null
         boolean allExist = INSTANCE.ifAllExistThenOrElse(
                 mockNoneIsNullAction, mockAnyIsNullAction, null, null, 1);
         assertThat(allExist).isFalse();
         verify(mockNoneIsNullAction, never()).act();
         verify(mockAnyIsNullAction, times(1)).act();
 
+        // all params exist
         reset(mockNoneIsNullAction);
         reset(mockAnyIsNullAction);
         allExist = INSTANCE.ifAllExistThenOrElse(
@@ -101,17 +140,67 @@ public class CompositeNullSafeTest {
         assertThat(allExist).isTrue();
         verify(mockNoneIsNullAction, times(1)).act();
         verify(mockAnyIsNullAction, never()).act();
+    }
+
+    @Test
+    public void testIfAllExistThenOrElse_Actions() {
+        try {
+            boolean allExist = INSTANCE.ifAllExistThenOrElse(null, null, null);
+            assertThat(allExist).isFalse();
+
+            allExist = INSTANCE.ifAllExistThenOrElse(null, null, 1);
+            assertThat(allExist).isTrue();
+        } catch (NullPointerException e) {
+            Assertions.fail("should not throw NullPointerException");
+        } catch (Exception e) {
+            Assertions.fail(e.getMessage());
+        }
+    }
+    @Test
+    public void testIfAllExistThenOrElseByOptional_ParamVariables() {
+        Action mockNoneIsNullAction = mock(Action.class);
+        Action mockAnyIsNullAction = mock(Action.class);
+
+        // empty option
+        boolean allExist = INSTANCE.ifAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullAction,
+                Optional.empty());
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        verify(mockAnyIsNullAction, times(1)).act();
+        // null param
+        reset(mockNoneIsNullAction);
+        reset(mockAnyIsNullAction);
+        allExist = INSTANCE.ifAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullAction,
+                null);
+        assertThat(allExist).isFalse();
+        verify(mockNoneIsNullAction, never()).act();
+        verify(mockAnyIsNullAction, times(1)).act();
 
         reset(mockNoneIsNullAction);
         reset(mockAnyIsNullAction);
-        allExist = INSTANCE.ifAllExistThenOrElse(
-                null, null, 1f, 2d, new Object(), Collections.EMPTY_LIST, new Object[]{});
+        allExist = INSTANCE.ifAllExistThenOrElseByOptional(
+                mockNoneIsNullAction, mockAnyIsNullAction,
+                Optional.of(1f), Optional.of(2d));
         assertThat(allExist).isTrue();
-        allExist = INSTANCE.ifAllExistThenOrElse(
-                null, null, 1f, 2d, null, Collections.EMPTY_LIST, new Object[]{});
-        assertThat(allExist).isFalse();
-        verify(mockNoneIsNullAction, never()).act();
+        verify(mockNoneIsNullAction, times(1)).act();
         verify(mockAnyIsNullAction, never()).act();
+    }
+
+    @Test
+    public void testIfAllExistThenOrElseByOptional_Actions() {
+        try {
+            boolean allExist = INSTANCE.ifAllExistThenOrElseByOptional(null, null, null);
+            assertThat(allExist).isFalse();
+
+            allExist = INSTANCE.ifAllExistThenOrElseByOptional(null, null, Optional.of(1));
+            assertThat(allExist).isTrue();
+        } catch (NullPointerException e) {
+            Assertions.fail("should not throw NullPointerException");
+        } catch (Exception e) {
+            Assertions.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -305,106 +394,8 @@ public class CompositeNullSafeTest {
     }
 
     @Test
-    public void testIfAllExistThenByOptional_AllExist() {
-        Action mockAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThenByOptional(mockAction,
-                Optional.of(1), Optional.of(2), Optional.of(3));
-        assertThat(allExist).isTrue();
-        verify(mockAction, Mockito.timeout(1)).act();
+    public void testMapIfAllExistOrElse_MapAllParams() {
+        Supplier<Object> mockMapFunction = mock(Supplier.class);
+        INSTANCE.mapIfAllExistOrElse(mockMapFunction, null, )
     }
-
-    @Test(expected = NullPointerException.class)
-    public void testIfAllExistThenByOptional_ActionIsNull() {
-        boolean allExist = INSTANCE.ifAllExistThenByOptional(null,
-                Optional.of(1), Optional.of(2), Optional.of(3));
-        Assertions.fail("Should not execute here");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIfAllExistThenByOptional_NoneOfParam() {
-        Action mockAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThen(mockAction);
-        Assertions.fail("Shoud not execute to here!");
-    }
-
-    @Test
-    public void testIfAllExistThenByOptional_NotAllExist() {
-        Action mockAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThenByOptional(mockAction, null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, Optional.of(1), null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, null, null);
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThenByOptional(mockAction, Optional.of(1), Optional.empty());
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-    }
-
-    @Test
-    public void testIfAllExistThenByOptional_DifferentType() {
-        Action mockAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThenByOptional(mockAction,
-                Optional.of(new Object()), Optional.of(1), Optional.of(2f), Optional.of(Collections.EMPTY_LIST));
-        assertThat(allExist).isTrue();
-        verify(mockAction, times(1)).act();
-
-        reset(mockAction);
-        allExist = INSTANCE.ifAllExistThenByOptional(mockAction,
-                Optional.of(1), Optional.of(new Object()), null, Optional.of(Collections.EMPTY_LIST));
-        assertThat(allExist).isFalse();
-        verify(mockAction, never()).act();
-    }
-
-    @Test
-    public void testIfAllExistThenOrElseByOptional() {
-        Action mockNoneIsNullAction = mock(Action.class);
-        Action mockAnyIsNullAction = mock(Action.class);
-
-        boolean allExist = INSTANCE.ifAllExistThenOrElseByOptional(
-                mockNoneIsNullAction, mockAnyIsNullAction,
-                Optional.empty(), null, Optional.of(1));
-        assertThat(allExist).isFalse();
-        verify(mockNoneIsNullAction, never()).act();
-        verify(mockAnyIsNullAction, times(1)).act();
-
-        reset(mockNoneIsNullAction);
-        reset(mockAnyIsNullAction);
-        allExist = INSTANCE.ifAllExistThenOrElseByOptional(
-                mockNoneIsNullAction, mockAnyIsNullAction,
-                Optional.of(1f), Optional.of(2d), Optional.of(new Object()),
-                Optional.of(Collections.EMPTY_LIST), Optional.of(new Object[]{}));
-        assertThat(allExist).isTrue();
-        verify(mockNoneIsNullAction, times(1)).act();
-        verify(mockAnyIsNullAction, never()).act();
-
-        reset(mockNoneIsNullAction);
-        reset(mockAnyIsNullAction);
-        allExist = INSTANCE.ifAllExistThenOrElseByOptional(
-                null, null,
-                Optional.of(1f), Optional.of(2d), Optional.of(new Object()),
-                Optional.of(Collections.EMPTY_LIST), Optional.of(new Object[]{}));
-        assertThat(allExist).isTrue();
-        allExist = INSTANCE.ifAllExistThenOrElseByOptional(
-                null, null,
-                Optional.of(1f), Optional.of(2d), Optional.empty(),
-                Optional.of(Collections.EMPTY_LIST), Optional.of(new Object[]{}));
-        assertThat(allExist).isFalse();
-        verify(mockNoneIsNullAction, never()).act();
-        verify(mockAnyIsNullAction, never()).act();
-    }
-
 }

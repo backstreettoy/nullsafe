@@ -45,39 +45,38 @@ public final class CompositeNullSafe {
             Object... params) {
         boolean paramNull = SINGLE_NULL_SAFE.isNull(params);
         if (paramNull) {
-            anyIsNullAction.act();
+            SINGLE_NULL_SAFE.notNullThen(anyIsNullAction, x -> x.act());
             return false;
         }
 
-        int paramIndex = 0;
-        List<Pair<Integer, Object>> pairs = new ArrayList<>(params.length);
-        for (Object param : params) {
-            pairs.add(Pair.of(paramIndex++, param));
+        Pair<Integer, ?>[] keyValueParams = new Pair[params.length];
+        for (int paramIndex = 0; paramIndex < params.length; ++paramIndex) {
+            keyValueParams[paramIndex] = Pair.of(paramIndex, params[paramIndex]);
         }
 
         return namedIfAllExistThenOrElse(noneOfNullAction,
                 x -> SINGLE_NULL_SAFE.notNullThen(anyIsNullAction, action -> action.act()),
-                pairs.toArray(new Pair[]{}));
+                keyValueParams);
     }
 
     @SafeVarargs
     public final boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
             Action anyIsNullAction,
             Optional<?>... params) {
-        boolean paramNotNull = SINGLE_NULL_SAFE.notNullThenOrElse(params, null, anyIsNullAction);
-        if (!paramNotNull) {
+        boolean paramNull = SINGLE_NULL_SAFE.isNull(params);
+        if (paramNull) {
+            SINGLE_NULL_SAFE.notNullThen(anyIsNullAction, x -> x.act());
             return false;
         }
 
-        int paramIndex = 0;
-        List<Pair<Integer, Object>> pairs = new ArrayList<>(params.length);
-        for (Object param : params) {
-            pairs.add(Pair.of(paramIndex++, param));
+        OptionalValuePair<Integer, ?>[] keyValueParams = new OptionalValuePair[params.length];
+        for (int paramIndex = 0; paramIndex < params.length; ++paramIndex) {
+            keyValueParams[paramIndex] = OptionalValuePair.of(paramIndex, params[paramIndex]);
         }
 
-        return namedIfAllExistThenOrElse(noneOfNullAction,
+        return namedIfAllExistThenOrElseByOptional(noneOfNullAction,
                 x -> SINGLE_NULL_SAFE.notNullThen(anyIsNullAction, action -> action.act()),
-                pairs.toArray(new Pair[]{}));
+                keyValueParams);
     }
 
     /**

@@ -174,7 +174,7 @@ public final class NullSafe {
      * @param anyIsNullConsumer not required, the function called when some <code>Optional</code> params is not present,
      *                          the keys of the <code>OptionalValuePair</code> which value not present will
      *                          be passed as param
-     * @param params the <code>OptionalValuePair</code> params
+     * @param params the <code>OptionalValuePair</code> params, at least on param needed
      * @return boolean indicate if all <code>OptionalValuePair</code> params are present
      */
     public static <K> boolean ifAllExistThenOrElseByOptional(Action noneOfNullAction,
