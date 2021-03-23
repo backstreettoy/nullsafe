@@ -12,13 +12,16 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -31,6 +34,7 @@ public class CompositeNullSafeTest {
     @Test
     public void testIfAllExistThen_ParamVariables() {
         Action mockAction = mock(Action.class);
+        Object o = spy(new Object());
 
         boolean allExist = INSTANCE.ifAllExistThen(mockAction, 1, 2, 3);
         assertThat(allExist).isTrue();
@@ -395,7 +399,12 @@ public class CompositeNullSafeTest {
 
     @Test
     public void testMapIfAllExistOrElse_MapAllParams() {
-        Supplier<Object> mockMapFunction = mock(Supplier.class);
-        INSTANCE.mapIfAllExistOrElse(mockMapFunction, null, )
+        Supplier<Optional<Object>> mockMapFunction = mock(Supplier.class);
+        Optional<Object> mockResult = Optional.of(new Object());
+        when(mockMapFunction.get()).thenReturn(mockResult);
+        Object fallback = new Object();
+        Optional<? super Object> result = INSTANCE.mapIfAllExistOrElse(mockMapFunction, fallback, new Object());
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result == mockResult).isTrue();
     }
 }
