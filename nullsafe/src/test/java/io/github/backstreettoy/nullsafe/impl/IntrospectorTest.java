@@ -9,12 +9,17 @@ public class IntrospectorTest {
     @Test
     public void testIntrospector() throws IntrospectionException {
 
+        Integer integer = new Integer(0);
+        integer.getClass().isArray();
+        integer.getClass().isPrimitive();
+
         BeanInfo beanInfo = Introspector.getBeanInfo(TestBean.class);
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
         for (PropertyDescriptor pd : propertyDescriptors) {
             if ("class".equals(pd.getName())) {
                 continue;
             }
+
 
             System.out.println(pd.getReadMethod().getName());
             System.out.println(pd.getWriteMethod().getName());
@@ -27,6 +32,9 @@ public class IntrospectorTest {
         private int intValue = 1;
 
         private boolean booleanValue = true;
+
+        private int[] intArray;
+        private Integer[] integerArray;
 
         public Long getLongValue() {
             return longValue;
@@ -59,6 +67,22 @@ public class IntrospectorTest {
 
         public void setStr(String s) {
 
+        }
+
+        public int[] getIntArray() {
+            return intArray;
+        }
+
+        public void setIntArray(int[] intArray) {
+            this.intArray = intArray;
+        }
+
+        public Integer[] getIntegerArray() {
+            return integerArray;
+        }
+
+        public void setIntegerArray(Integer[] integerArray) {
+            this.integerArray = integerArray;
         }
     }
 }

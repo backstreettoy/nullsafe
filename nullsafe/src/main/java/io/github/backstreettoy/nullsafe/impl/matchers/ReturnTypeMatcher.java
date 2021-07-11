@@ -4,12 +4,15 @@ import java.beans.PropertyDescriptor;
 
 public class ReturnTypeMatcher extends AbstractMatcher {
 
-    public ReturnTypeMatcher(Class<?> clazz) {
+    private Class<?> clazz;
 
+    public ReturnTypeMatcher(Class<?> clazz) {
+        this.clazz = clazz;
     }
 
     @Override
     public boolean match(PropertyDescriptor propertyDescriptor) {
-        return false;
+        Class<?> propertyType = propertyDescriptor.getPropertyType();
+        return clazz.isAssignableFrom(propertyType);
     }
 }

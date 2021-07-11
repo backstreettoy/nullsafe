@@ -20,11 +20,12 @@ public class IterateUsers {
         for (User user : users) {
             User readOnlyUser = NullSafeWrapper.wrapRecursively(user)
                     .fallback(property("password"), "defaultPassword")
-                    .fallback(Matchers.returnType(String.class), "defaultString").get();
+                    .get();
 
             userDescription.add(new StringBuilder()
                     .append(readOnlyUser.getId()).append("\t")
                     .append(readOnlyUser.getUserName()).append("\t")
+                    .append(readOnlyUser.getPassword()).append("\t")
                     .append(readOnlyUser.getLevel()).append("\t")
                     .append(readOnlyUser.getOptionalName()).append("\t")
                     .append(readOnlyUser.getScore()).append("\t").toString());

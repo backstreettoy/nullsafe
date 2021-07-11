@@ -16,14 +16,13 @@ import java.util.function.Supplier;
 
 public class NullSafeWrapper<T> {
 
-    private static final Class[] ATTACHED_INTERFACES = new Class[] {NullSafeWrapped.class};
 
     public static <T> NullSafeObjectWrapper<T> wrap(T obj) {
         return null;
     }
 
     public static <T> NullSafeObjectWrapper<T> wrapRecursively(T obj) {
-        return new NullSafeObjectWrapper<>(obj);
+        return new NullSafeObjectWrapper(obj);
     }
 
     public static <T> T unwrap(T obj) {
@@ -31,20 +30,7 @@ public class NullSafeWrapper<T> {
     }
 
     public static final <T> T apply(Class<T> clazz) {
-        try {
-            ProxyFactory proxyFactory = new ProxyFactory();
-            proxyFactory.setSuperclass(clazz);
-            BeanInfo beanInfo = introspectBeanInfo(clazz);
-            proxyFactory.setFilter(new MethodFilterImpl(beanInfo));
-            proxyFactory.setInterfaces(ATTACHED_INTERFACES);
-            Class<?> subClazz = proxyFactory.createClass();
-
-            Object subInstance = subClazz.newInstance();
-            ((Proxy) subInstance).setHandler(new GetterMethodHandler(beanInfo));
-            return (T) subInstance;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
 
@@ -52,36 +38,6 @@ public class NullSafeWrapper<T> {
         return Introspector.getBeanInfo(clazz);
     }
 
-    /**
-     * Indicator of a wrapped class
-     */
-    private static interface NullSafeWrapped {
-
-    }
-
-    private static class MethodFilterImpl implements MethodFilter {
-        private Set<Method> interceptMethods;
-
-        public MethodFilterImpl(BeanInfo beanInfo) {
-            interceptMethods = new HashSet<>();
-            if (beanInfo != null && beanInfo.getPropertyDescriptors() != null) {
-                for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
-                    if ("class".equals(propertyDescriptor.getName())) {
-                        continue;
-                    }
-                    Method readMethod = propertyDescriptor.getReadMethod();
-                    if (readMethod != null) {
-                        interceptMethods.add(readMethod);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public boolean isHandled(Method m) {
-            return interceptMethods.contains(m);
-        }
-    }
 
     private static class GetterMethodHandler implements MethodHandler {
 
