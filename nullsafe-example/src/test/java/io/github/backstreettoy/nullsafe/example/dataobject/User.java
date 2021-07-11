@@ -4,9 +4,8 @@ public class User {
 
     private Long id;
     private String userName;
-    private String password;
     private Integer level;
-    private Integer score;
+    private Long score;
     private String optionalName;
 
     public Long getId() {
@@ -25,14 +24,6 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public Integer getLevel() {
         return level;
     }
@@ -41,19 +32,19 @@ public class User {
         this.level = level;
     }
 
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
     public String getOptionalName() {
         return optionalName;
     }
 
     public void setOptionalName(String optionalName) {
         this.optionalName = optionalName;
+    }
+
+    public Long getScore() {
+        return score;
+    }
+
+    public void setScore(Long score) {
+        this.score = score;
     }
 }

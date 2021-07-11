@@ -1,23 +1,22 @@
 package io.github.backstreettoy.nullsafe.impl.proxywrap;
 
-import io.github.backstreettoy.nullsafe.impl.Pair;
-import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.AbstractFieldHandler;
-import io.github.backstreettoy.nullsafe.impl.matchers.AbstractMatcher;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import io.github.backstreettoy.nullsafe.impl.Pair;
+import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.AbstractFieldHandler;
+import io.github.backstreettoy.nullsafe.impl.matchers.AbstractMatcher;
 
 /**
  * @author backstreettoy
@@ -100,6 +99,4 @@ public class SimpleWrap {
             return interceptMethods.contains(m);
         }
     }
-
-
 }

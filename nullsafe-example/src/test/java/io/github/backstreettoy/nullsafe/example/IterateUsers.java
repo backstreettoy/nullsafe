@@ -19,13 +19,15 @@ public class IterateUsers {
         List<String> userDescription = new ArrayList<>();
         for (User user : users) {
             User readOnlyUser = NullSafeWrapper.wrapRecursively(user)
-                    .fallback(property("password"), "defaultPassword")
+                    .fallback(property("optionalName"), "unknown")
+                    .fallback(property("level"), 0)
+                    // TODO java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Long
+//                    .fallback(property("score"), 100)
                     .get();
 
             userDescription.add(new StringBuilder()
                     .append(readOnlyUser.getId()).append("\t")
                     .append(readOnlyUser.getUserName()).append("\t")
-                    .append(readOnlyUser.getPassword()).append("\t")
                     .append(readOnlyUser.getLevel()).append("\t")
                     .append(readOnlyUser.getOptionalName()).append("\t")
                     .append(readOnlyUser.getScore()).append("\t").toString());
@@ -38,10 +40,16 @@ public class IterateUsers {
         User userOne = new User();
         userOne.setId(1L);
         userOne.setUserName("userOne");
+        // null indicates that this field has no valid value.
+        userOne.setLevel(null);
+        userOne.setScore(null);
 
         User userTwo = new User();
         userTwo.setId(2L);
         userTwo.setUserName("userTwo");
+        userTwo.setLevel(2);
+        userTwo.setOptionalName("Jack");
+        userTwo.setScore(100L);
 
         return Arrays.asList(userOne, userTwo);
     }
