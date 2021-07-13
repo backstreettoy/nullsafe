@@ -7,19 +7,14 @@ import java.util.function.Supplier;
  */
 public class SupplierFieldHandler extends AbstractFieldHandler {
 
-    private Supplier<?> supplier;
+    private Supplier<FallbackResult> supplier;
 
-    public SupplierFieldHandler(Supplier<?> supplier) {
+    public SupplierFieldHandler(Supplier<FallbackResult> supplier) {
         this.supplier = supplier;
     }
 
     @Override
-    public boolean raiseException() {
-        return false;
-    }
-
-    @Override
-    public Object fallback() {
+    public FallbackResult fallback() {
          return supplier.get();
     }
 }

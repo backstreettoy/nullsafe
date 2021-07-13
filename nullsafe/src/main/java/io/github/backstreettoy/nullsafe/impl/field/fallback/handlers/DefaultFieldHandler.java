@@ -13,12 +13,7 @@ public class DefaultFieldHandler extends AbstractFieldHandler {
     }
 
     @Override
-    public boolean raiseException() {
-        return false;
-    }
-
-    @Override
-    public Object fallback() {
-        return value;
+    public FallbackResult fallback() {
+        return FallbackResult.fallback(value);
     }
 }

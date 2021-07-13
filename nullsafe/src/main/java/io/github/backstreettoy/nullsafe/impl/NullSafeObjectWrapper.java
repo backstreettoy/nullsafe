@@ -4,7 +4,6 @@ import io.github.backstreettoy.nullsafe.NullSafe;
 import io.github.backstreettoy.nullsafe.impl.exception.EnrichedNullPointerException;
 import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.AbstractFieldHandler;
 import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.DefaultFieldHandler;
-import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.RaiseExceptionFieldHandler;
 import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.SupplierFieldHandler;
 import io.github.backstreettoy.nullsafe.impl.matchers.AbstractMatcher;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SimpleWrap;
