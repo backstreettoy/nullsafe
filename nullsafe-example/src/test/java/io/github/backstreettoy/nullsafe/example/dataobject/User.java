@@ -1,5 +1,8 @@
 package io.github.backstreettoy.nullsafe.example.dataobject;
 
+import lombok.ToString;
+
+@ToString
 public class User {
 
     private Long id;
@@ -7,6 +10,9 @@ public class User {
     private Integer level;
     private Long score;
     private String optionalName;
+
+    private String jobDescription;
+    private String educationDescription;
 
     public Long getId() {
         return id;
@@ -46,5 +52,21 @@ public class User {
 
     public void setScore(Long score) {
         this.score = score;
+    }
+
+    public String getJobDescription() {
+        return jobDescription;
+    }
+
+    public void setJobDescription(String jobDescription) {
+        this.jobDescription = jobDescription;
+    }
+
+    public String getEducationDescription() {
+        return educationDescription;
+    }
+
+    public void setEducationDescription(String educationDescription) {
+        this.educationDescription = educationDescription;
     }
 }

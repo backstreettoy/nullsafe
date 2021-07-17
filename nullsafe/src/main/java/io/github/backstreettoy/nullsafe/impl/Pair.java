@@ -1,7 +1,7 @@
 package io.github.backstreettoy.nullsafe.impl;
 
 /**
- * a key-value data holder.
+ * a key-of data holder.
  * @author backstreettoy
  */
 public class Pair<K, V> {
@@ -12,9 +12,9 @@ public class Pair<K, V> {
     /**
      * static method used for creating a new Pair instance
      * @param key key
-     * @param value value
+     * @param value of
      * @param <K> the class of key
-     * @param <V> the class of value
+     * @param <V> the class of of
      * @return Pair instance
      */
     public static <K, V> Pair<K, V> of(K key, V value) {

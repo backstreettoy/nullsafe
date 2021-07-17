@@ -4,10 +4,7 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import javassist.util.proxy.MethodHandler;
@@ -23,6 +20,7 @@ import io.github.backstreettoy.nullsafe.impl.matchers.AbstractMatcher;
 public class MethodHandlerImpl<T> implements MethodHandler {
 
 //    private Map<Method, NullSafeWrapped> methodProxies;
+    private Map<Method, String> getterToFieldMapping;
     private Map<Method, List<AbstractFieldHandler>> propertyfallbackHandlers;
     private List<Pair<AbstractMatcher, AbstractFieldHandler>> policies;
     private Supplier<T> supplier;
@@ -32,6 +30,7 @@ public class MethodHandlerImpl<T> implements MethodHandler {
         this.policies = policies;
 //        methodProxies = new HashMap<>();
         propertyfallbackHandlers = new HashMap<>();
+        getterToFieldMapping = new HashMap<>();
         initProxy(policies, beanInfo);
     }
 
@@ -42,6 +41,8 @@ public class MethodHandlerImpl<T> implements MethodHandler {
             if (readMethod == null) {
                 continue;
             }
+
+            addGetterToMapping(readMethod, propertyDescriptor.getName());
             Class<?> propertyType = propertyDescriptor.getPropertyType();
             if (propertyType.isPrimitive()) {
                 continue;
@@ -54,6 +55,10 @@ public class MethodHandlerImpl<T> implements MethodHandler {
                 }
             }
         }
+    }
+
+    private void addGetterToMapping(Method readMethod, String name) {
+        getterToFieldMapping.put(readMethod, name);
     }
 
     private void addFieldHandlerToMethod(Method method, AbstractFieldHandler handler) {
@@ -78,9 +83,20 @@ public class MethodHandlerImpl<T> implements MethodHandler {
 
         List<AbstractFieldHandler> handlers = propertyfallbackHandlers.get(thisMethod);
         if (!handlers.isEmpty()) {
-            return handlers.get(0).fallback();
+            String fieldName = getterToFieldMapping.get(thisMethod);
+
+            for (AbstractFieldHandler handler : handlers) {
+                AbstractFieldHandler.FallbackResult fallbackResult = handler.fallback(self, thisMethod, fieldName);
+                Optional<?> holder = fallbackResult.get();
+                if (holder == null) {
+                    // Indicate this handler pass to handle
+                    continue;
+                } else {
+                    return holder.orElse(null);
+                }
+            }
         }
-        throw new RuntimeException("code error");
+        return null;
     }
 
     private static class Getter implements Supplier<Object> {

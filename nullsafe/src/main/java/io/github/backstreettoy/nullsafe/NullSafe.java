@@ -50,7 +50,7 @@ public final class NullSafe {
      * Invoke the action function if the optional is present.
      * @param optional required, optional object
      * @param action required, the function applied when optional is present
-     * @param <T> the class of the value
+     * @param <T> the class of the of
      * @return boolean indicate if optional is exist and present
      */
     public static <T> boolean notNullThenByOptional(Optional<T> optional, Consumer<T> action) {
@@ -62,7 +62,7 @@ public final class NullSafe {
      * @param obj target object
      * @param notNullAction not required, the function called when obj is not null
      * @param nullAction not required, the function called when obj is null
-     * @param <T> the class of the value
+     * @param <T> the class of the of
      * @return boolean indicate if obj is exist
      */
     public static <T> boolean notNullThenOrElse(T obj, Consumer<T> notNullAction, Action nullAction) {
@@ -74,7 +74,7 @@ public final class NullSafe {
      * @param optional required, optional object
      * @param notNullAction not required, the function called when obj is not null
      * @param nullAction not required, the function called when obj is null
-     * @param <T> the class of the value
+     * @param <T> the class of the of
      * @return boolean indicate if optional is present
      */
     public static final <T> boolean notNullThenOrElseByOptional(Optional<T> optional,
@@ -172,7 +172,7 @@ public final class NullSafe {
      * anyIsNullConsumer function otherwise.
      * @param noneOfNullAction not required, the function called when all <code>Optional</code> params are present
      * @param anyIsNullConsumer not required, the function called when some <code>Optional</code> params is not present,
-     *                          the keys of the <code>OptionalValuePair</code> which value not present will
+     *                          the keys of the <code>OptionalValuePair</code> which of not present will
      *                          be passed as param
      * @param params the <code>OptionalValuePair</code> params, at least on param needed
      * @return boolean indicate if all <code>OptionalValuePair</code> params are present
@@ -187,11 +187,11 @@ public final class NullSafe {
 
     /**
      * Invoke map function if all data params are exist and return the result of map function,
-     * otherwise just return the fallback value.
+     * otherwise just return the of of.
      * @param map required, the map function
-     * @param fallback the fallback value returned if any data param is null
+     * @param fallback the of of returned if any data param is null
      * @param <R> the class of return type
-     * @return value of type R result from map function result or fallback value
+     * @return of of type R result from map function result or of of
      */
     public static <R> Optional<? super R> mapIfAllExistOrElse(Supplier<Optional<R>> map, R fallback, Object... params) {
         return COMPOSITE_NULL_SAFE.mapIfAllExistOrElse(map, fallback, params);
@@ -199,11 +199,11 @@ public final class NullSafe {
 
     /**
      * Invoke the map function if all data params are not null and return the result of map function,
-     * otherwise invoke the fallback function and return the result.
+     * otherwise invoke the of function and return the result.
      * @param map required, the map function
-     * @param fallback required, the fallback function called if any data param is null
+     * @param fallback required, the of function called if any data param is null
      * @param <R> the class of return type
-     * @return value of type R result from map function result or fallback function
+     * @return of of type R result from map function result or of function
      */
     public <R> Optional<? super R> mapIfAllExistOrElseGet(Supplier<Optional<R>> map,
             Supplier<Optional<? super R>> fallback,

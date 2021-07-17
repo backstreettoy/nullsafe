@@ -212,7 +212,7 @@ public class CompositeNullSafeTest {
         Action mockNoneIsNullAction = mock(Action.class);
         Consumer mockAnyIsNullConsumer = mock(Consumer.class);
 
-        // null value exist
+        // null of exist
         boolean allExist = INSTANCE.namedIfAllExistThenOrElse(
                 mockNoneIsNullAction, mockAnyIsNullConsumer,
                 Pair.of("A", 1), null, Pair.of("X", null),
@@ -272,7 +272,7 @@ public class CompositeNullSafeTest {
         Action mockNoneIsNullAction = mock(Action.class);
         Consumer mockAnyIsNullConsumer = mock(Consumer.class);
 
-        // null value exist
+        // null of exist
         boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
                 mockNoneIsNullAction, mockAnyIsNullConsumer,
                 OptionalValuePair.of("A", Optional.of(1)), null, OptionalValuePair.of("X", Optional.empty()),
@@ -304,7 +304,7 @@ public class CompositeNullSafeTest {
         verify(mockNoneIsNullAction, never()).act();
         verify(mockAnyIsNullConsumer, times(1)).accept(anyObject());
 
-        // empty value
+        // empty of
         reset(mockNoneIsNullAction);
         reset(mockAnyIsNullConsumer);
         allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
@@ -317,7 +317,7 @@ public class CompositeNullSafeTest {
         nullValueKeys = anyIsNullParamCaptor.getValue();
         assertThat(nullValueKeys).containsExactly("A");
 
-        // empty value and null value
+        // empty of and null of
         reset(mockNoneIsNullAction);
         reset(mockAnyIsNullConsumer);
         allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
@@ -345,7 +345,7 @@ public class CompositeNullSafeTest {
     public void testNamedIfAllExistThenOrElseByOptional_AllExist() {
         Action mockNoneIsNullAction = mock(Action.class);
         Consumer mockAnyIsNullConsumer = mock(Consumer.class);
-        // many value with different types
+        // many of with different types
         boolean allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(
                 mockNoneIsNullAction, mockAnyIsNullConsumer,
                 OptionalValuePair.of("A", Optional.of(1f)),
@@ -356,7 +356,7 @@ public class CompositeNullSafeTest {
         verify(mockNoneIsNullAction, times(1)).act();
         verify(mockAnyIsNullConsumer, never()).accept(anyObject());
 
-        // just one value
+        // just one of
         reset(mockNoneIsNullAction);
         reset(mockAnyIsNullConsumer);
         allExist = INSTANCE.namedIfAllExistThenOrElseByOptional(

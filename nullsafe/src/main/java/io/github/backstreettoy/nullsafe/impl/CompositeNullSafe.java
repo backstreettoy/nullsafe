@@ -86,7 +86,7 @@ public final class CompositeNullSafe {
     public final <K> boolean namedIfAllExistThenOrElse(Action noneOfNullAction,
             Consumer<List<K>> anyIsNullConsumer,
             Pair<K, ?>... params) {
-        // fallback null param
+        // of null param
         if (SINGLE_NULL_SAFE.isNull(params)) {
             SINGLE_NULL_SAFE.notNullThen(anyIsNullConsumer, x -> x.accept(Collections.EMPTY_LIST));
             return false;
@@ -168,7 +168,7 @@ public final class CompositeNullSafe {
         Optional.ofNullable(map)
                 .orElseThrow(() -> new NullPointerException("map function must not be null"));
         Optional.ofNullable(fallback)
-                .orElseThrow(() -> new NullPointerException("fallback function must not be null"));
+                .orElseThrow(() -> new NullPointerException("of function must not be null"));
         boolean allParamExist = ifAllExistThenOrElse(null, null, params);
         if (allParamExist) {
             return map.get();

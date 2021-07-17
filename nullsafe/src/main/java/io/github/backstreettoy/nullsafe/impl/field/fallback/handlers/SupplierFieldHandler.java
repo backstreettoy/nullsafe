@@ -1,5 +1,6 @@
 package io.github.backstreettoy.nullsafe.impl.field.fallback.handlers;
 
+import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 /**
@@ -14,7 +15,8 @@ public class SupplierFieldHandler extends AbstractFieldHandler {
     }
 
     @Override
-    public FallbackResult fallback() {
+    public FallbackResult fallback(Object obj, Method getter, String fieldName) {
          return supplier.get();
     }
+
 }
