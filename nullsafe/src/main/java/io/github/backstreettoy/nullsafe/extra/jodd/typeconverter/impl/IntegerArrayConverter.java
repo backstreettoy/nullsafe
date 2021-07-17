@@ -25,12 +25,12 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.buffer.FastIntBuffer;
-import jodd.typeconverter.TypeConverter;
-import jodd.typeconverter.TypeConverterManager;
-import jodd.util.StringUtil;
-
 import java.util.Collection;
+
+import io.github.backstreettoy.nullsafe.extra.jodd.buffer.FastIntBuffer;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverterManager;
+import io.github.backstreettoy.nullsafe.extra.jodd.util.StringUtil;
 
 /**
  * Converts given object to <code>int[]</code>.

@@ -25,13 +25,13 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.typeconverter.TypeConversionException;
-import jodd.typeconverter.TypeConverter;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConversionException;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
 
 /**
  * Converter given object to <code>URI</code>.

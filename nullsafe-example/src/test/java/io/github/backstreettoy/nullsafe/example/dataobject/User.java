@@ -11,6 +11,8 @@ public class User {
     private Long score;
     private String optionalName;
 
+    private int age;
+
     private String jobDescription;
     private String educationDescription;
 
@@ -68,5 +70,13 @@ public class User {
 
     public void setEducationDescription(String educationDescription) {
         this.educationDescription = educationDescription;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 }

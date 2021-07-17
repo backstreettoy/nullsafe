@@ -25,7 +25,7 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.typeconverter.TypeConverterManager;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverterManager;
 
 /**
  * Converts given object to <code>String[]</code>.

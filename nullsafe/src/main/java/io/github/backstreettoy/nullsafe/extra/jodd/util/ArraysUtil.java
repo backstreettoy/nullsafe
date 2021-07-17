@@ -27,7 +27,9 @@ package io.github.backstreettoy.nullsafe.extra.jodd.util;
 
 import javax.annotation.Generated;
 import java.lang.reflect.Array;
-import static jodd.util.StringPool.NULL;
+
+import static io.github.backstreettoy.nullsafe.extra.jodd.util.StringPool.NULL;
+
 
 /**
  * Array utilities.

@@ -25,9 +25,9 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.typeconverter.TypeConverter;
-
 import java.util.Locale;
+
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
 
 /**
  * Converts given object to Java <code>Locale</code>.

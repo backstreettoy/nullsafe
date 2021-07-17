@@ -6,7 +6,7 @@ public class NullSafeWrapperTest {
 
     @Test
     public void testWrap() {
-
+        System.out.println(int.class.isAssignableFrom(Integer.class));
     }
 
 

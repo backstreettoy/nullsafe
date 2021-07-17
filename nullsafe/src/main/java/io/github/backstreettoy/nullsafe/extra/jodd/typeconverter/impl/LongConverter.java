@@ -25,9 +25,9 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.typeconverter.TypeConversionException;
-import jodd.typeconverter.TypeConverter;
-import jodd.util.StringUtil;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConversionException;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
+import io.github.backstreettoy.nullsafe.extra.jodd.util.StringUtil;
 
 /**
  * Converts given object to a <code>Long</code>.

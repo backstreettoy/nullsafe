@@ -25,7 +25,6 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.util;
 
-import jodd.core.JoddCore;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -33,7 +32,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static jodd.util.StringPool.EMPTY;
+import static io.github.backstreettoy.nullsafe.extra.jodd.util.StringPool.EMPTY;
+
 
 /**
  * Various String utilities.
@@ -625,7 +625,7 @@ public class StringUtil {
 			toIndex = len;
 		}
 		if (fromIndex >= toIndex) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		return string.substring(fromIndex, toIndex);
@@ -1895,7 +1895,7 @@ public class StringUtil {
 		}
 		if (string.length() == 1) {
 			if (string.charAt(0) == c) {
-				return StringPool.EMPTY;
+				return EMPTY;
 			}
 			return string;
 		}
@@ -2142,7 +2142,7 @@ public class StringUtil {
 		}
 
 		if (array.length == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		if (array.length == 1) {
@@ -2166,7 +2166,7 @@ public class StringUtil {
 		}
 
 		if (array.length == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		if (array.length == 1) {
@@ -2196,7 +2196,7 @@ public class StringUtil {
 		}
 
 		if (collection.size() == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		final StringBuilder sb = new StringBuilder(collection.size() * 16);
@@ -2220,7 +2220,7 @@ public class StringUtil {
 		}
 
 		if (collection.size() == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		final StringBuilder sb = new StringBuilder(collection.size() * 16);
@@ -2247,7 +2247,7 @@ public class StringUtil {
 		}
 
 		if (array.length == 0) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		if (array.length == 1) {
@@ -2425,7 +2425,7 @@ public class StringUtil {
 		}
 
 		if (end <= start) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		return string.substring(start, end);
@@ -2450,7 +2450,7 @@ public class StringUtil {
 		leftNdx += left.length();
 
 		if (leftNdx >= rightNdx) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 
 		return string.substring(leftNdx, rightNdx);
@@ -2602,7 +2602,7 @@ public class StringUtil {
 			index++;
 			prefix.append(c);
 		}
-		return prefix.length() == 0 ? StringPool.EMPTY : prefix.toString();
+		return prefix.length() == 0 ? EMPTY : prefix.toString();
 	}
 
 
@@ -2785,7 +2785,7 @@ public class StringUtil {
 	 */
 	public static String ifNotNull(final String input, final Function<String, String> stringFunction) {
 		if (input == null) {
-			return StringPool.EMPTY;
+			return EMPTY;
 		}
 		return stringFunction.apply(input);
 	}
@@ -2797,11 +2797,7 @@ public class StringUtil {
 	 * Returns String bytes using Jodds default encoding.
 	 */
 	public static byte[] getBytes(final String string) {
-		try {
-			return string.getBytes(JoddCore.encoding);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return string.getBytes();
 	}
 	public static byte[] getBytes(final String string, final String charsetName) {
 		try {
@@ -2812,11 +2808,7 @@ public class StringUtil {
 	}
 
 	public static String newString(final byte[] bytes) {
-		try {
-			return new String(bytes, JoddCore.encoding);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return new String(bytes);
 	}
 	public static String newString(final byte[] bytes, final String charsetName) {
 		try {

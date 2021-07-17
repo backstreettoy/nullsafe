@@ -25,38 +25,11 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.util;
 
-import jodd.util.cl.ClassLoaderStrategy;
-import jodd.net.URLDecoder;
-
-import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.net.URL;
+import java.lang.reflect.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.jar.JarFile;
+import java.util.*;
 
 /**
  * Class utilities.
@@ -1188,38 +1161,6 @@ public class ClassUtil {
 		}
 	}
 
-	/**
-	 * Smart variant of {@link #getCallerClass(int)} that skips all relevant Jodd calls.
-	 * However, this one does not use the security manager.
-	 */
-	public static Class getCallerClass() {
-		String className = null;
-		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
-
-		for (StackTraceElement stackTraceElement : stackTraceElements) {
-			className = stackTraceElement.getClassName();
-			String methodName = stackTraceElement.getMethodName();
-
-			if (methodName.equals("loadClass")) {
-				if (className.contains(ClassLoaderStrategy.class.getSimpleName())) {
-					continue;
-				}
-				if (className.equals(ClassLoaderUtil.class.getName())) {
-					continue;
-				}
-			} else if (methodName.equals("getCallerClass")) {
-				continue;
-			}
-			break;
-		}
-
-		try {
-			return Thread.currentThread().getContextClassLoader().loadClass(className);
-		} catch (ClassNotFoundException cnfex) {
-			throw new UnsupportedOperationException(className + " not found.");
-		}
-	}
-
 	// ---------------------------------------------------------------- enum
 
 	/**
@@ -1273,37 +1214,6 @@ public class ClassUtil {
 		}
 	}
 
-	/**
-	 * Returns the jar file from which the given class is loaded; or null
-	 * if no such jar file can be located.
-	 */
-	public static JarFile jarFileOf(final Class<?> klass) {
-		URL url = klass.getResource(
-			"/" + klass.getName().replace('.', '/') + ".class");
-
-		if (url == null) {
-			return null;
-		}
-
-		String s = url.getFile();
-		int beginIndex = s.indexOf("file:") + "file:".length();
-		int endIndex = s.indexOf(".jar!");
-		if (endIndex == -1) {
-			return null;
-		}
-
-		endIndex += ".jar".length();
-		String f = s.substring(beginIndex, endIndex);
-		// decode URL string - it may contain encoded chars (e.g. whitespaces) which are not supported for file-instances
-		f = URLDecoder.decode(f, "UTF-8");
-		File file = new File(f);
-
-		try {
-			return file.exists() ? new JarFile(file) : null;
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
 
 	// ---------------------------------------------------------------- class names
 

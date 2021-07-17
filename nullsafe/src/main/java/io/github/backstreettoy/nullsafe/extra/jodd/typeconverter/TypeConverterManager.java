@@ -38,7 +38,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 import io.github.backstreettoy.nullsafe.extra.jodd.cache.TypeCache;
-import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl.StringConverter;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl.*;
+import io.github.backstreettoy.nullsafe.extra.jodd.util.ClassUtil;
 
 /**
  * Provides dynamic object conversion to a type.
@@ -73,32 +74,26 @@ public class TypeConverterManager {
 		IntegerConverter integerConverter = new IntegerConverter();
 		register(Integer.class, integerConverter);
 		register(int.class, integerConverter);
-		register(MutableInteger.class, new MutableIntegerConverter(this));
 
 		ShortConverter shortConverter = new ShortConverter();
 		register(Short.class, shortConverter);
 		register(short.class, shortConverter);
-		register(MutableShort.class, new MutableShortConverter(this));
 
 		LongConverter longConverter = new LongConverter();
 		register(Long.class, longConverter);
 		register(long.class, longConverter);
-		register(MutableLong.class, new MutableLongConverter(this));
 
 		ByteConverter byteConverter = new ByteConverter();
 		register(Byte.class, byteConverter);
 		register(byte.class, byteConverter);
-		register(MutableByte.class, new MutableByteConverter(this));
 
 		FloatConverter floatConverter = new FloatConverter();
 		register(Float.class, floatConverter);
 		register(float.class, floatConverter);
-		register(MutableFloat.class, new MutableFloatConverter(this));
 
 		DoubleConverter doubleConverter = new DoubleConverter();
 		register(Double.class, doubleConverter);
 		register(double.class, doubleConverter);
-		register(MutableDouble.class, new MutableDoubleConverter(this));
 
 		BooleanConverter booleanConverter = new BooleanConverter();
 		register(Boolean.class, booleanConverter);

@@ -23,32 +23,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
-
-import java.util.TimeZone;
-
-import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
-
 /**
- * Converts given object to Java <code>TimeZone</code>.
- * <ul>
- * <li><code>null</code> value is returned as <code>null</code></li>
- * <li>object of destination type is simply casted</li>
- * <li>finally, string representation of the object is used for getting the time zone</li>
- * </ul>
+ * Faster primitive and object buffers.
  */
-public class TimeZoneConverter implements TypeConverter<TimeZone> {
-
-	public TimeZone convert(final Object value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (value.getClass() == TimeZone.class) {
-			return (TimeZone) value;
-		}
-
-		return TimeZone.getTimeZone(value.toString());
-
-	}
-}
+package io.github.backstreettoy.nullsafe.extra.jodd.buffer;

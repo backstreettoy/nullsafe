@@ -31,7 +31,8 @@ public class IterateUsers {
                             custom((obj, method, field)
                                     -> of("No " + field.replace("Description", "") + " content")))
                     // TODO java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Long
-//                    .of(property("score"), 100)
+                    .fallback(property("score"), value(100))
+                    .fallback(property("age"), value(10))
                     .get();
 
 //            userDescription.add(new StringBuilder()

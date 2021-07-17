@@ -25,10 +25,10 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.typeconverter.TypeConversionException;
-import jodd.typeconverter.TypeConverter;
-
 import java.util.UUID;
+
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConversionException;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
 
 public class UUIDConverter implements TypeConverter<UUID> {
 

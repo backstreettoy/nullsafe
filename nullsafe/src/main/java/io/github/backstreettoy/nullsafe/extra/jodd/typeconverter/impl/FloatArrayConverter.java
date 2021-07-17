@@ -28,7 +28,6 @@ package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import jodd.util.StringUtil;
 
 import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
 import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverterManager;

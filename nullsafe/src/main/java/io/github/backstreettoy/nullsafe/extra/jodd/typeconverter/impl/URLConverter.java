@@ -25,14 +25,12 @@
 
 package io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.impl;
 
-import jodd.io.FileUtil;
-import jodd.typeconverter.TypeConversionException;
-import jodd.typeconverter.TypeConverter;
-
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConversionException;
+import io.github.backstreettoy.nullsafe.extra.jodd.typeconverter.TypeConverter;
 
 /**
  * Converts given object to <code>URL</code>.
@@ -55,15 +53,6 @@ public class URLConverter implements TypeConverter<URL> {
 		
 		if (value instanceof URL) {
 			return (URL) value;
-		}
-
-		if (value instanceof File) {
-			File file = (File) value;
-			try {
-				return FileUtil.toURL(file);
-			} catch (MalformedURLException muex) {
-				throw new TypeConversionException(value, muex);
-			}
 		}
 
 		if (value instanceof URI) {

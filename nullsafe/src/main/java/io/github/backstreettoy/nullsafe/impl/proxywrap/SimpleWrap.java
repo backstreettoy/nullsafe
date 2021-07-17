@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.backstreettoy.nullsafe.impl.Pair;
+import io.github.backstreettoy.nullsafe.impl.config.WrapConfig;
 import io.github.backstreettoy.nullsafe.impl.field.fallback.handlers.AbstractFieldHandler;
 import io.github.backstreettoy.nullsafe.impl.matchers.AbstractMatcher;
 
@@ -30,23 +31,27 @@ public class SimpleWrap {
     private static final Map<Class<?>, BeanInfo> BEAN_INFO_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
 
-    public static <T> T wrap(Class<T> clazz, T obj, List<Pair<AbstractMatcher, AbstractFieldHandler>> policies) {
-        return wrapSupplier(clazz, () -> obj, policies);
+    public static <T> T wrap(Class<T> clazz, T obj, List<Pair<AbstractMatcher, AbstractFieldHandler>> policies,
+                             WrapConfig config) {
+        return wrapSupplier(clazz, () -> obj, policies, config);
     }
 
-    public static <T> T wrapSupplier(Class<T> clazz, Supplier<T> supplier, List<Pair<AbstractMatcher, AbstractFieldHandler>> policies) {
+    public static <T> T wrapSupplier(Class<T> clazz, Supplier<T> supplier,
+                                     List<Pair<AbstractMatcher, AbstractFieldHandler>> policies,
+                                     WrapConfig config) {
         BeanInfo beanInfo = parseBeanInfo(clazz);
         Class<?> subClazz = createSubClass(clazz, beanInfo);
         T subInstance = (T)createSubInstance(subClazz);
-        wrapProperty(subInstance, supplier, policies, beanInfo);
+        wrapProperty(subInstance, supplier, policies, config, beanInfo);
         return subInstance;
     }
 
     private static <T> void wrapProperty(T subInstance,
                                          Supplier<T> supplier,
                                          List<Pair<AbstractMatcher, AbstractFieldHandler>> policies,
+                                         WrapConfig config,
                                          BeanInfo beanInfo) {
-        MethodHandlerImpl<T> methodHandler = new MethodHandlerImpl<>(supplier, policies, beanInfo);
+        MethodHandlerImpl<T> methodHandler = new MethodHandlerImpl<>(supplier, policies, config, beanInfo);
         ((Proxy)subInstance).setHandler(methodHandler);
     }
 
