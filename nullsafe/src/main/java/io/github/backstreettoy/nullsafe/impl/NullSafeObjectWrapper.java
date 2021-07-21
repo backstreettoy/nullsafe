@@ -1,7 +1,9 @@
 package io.github.backstreettoy.nullsafe.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import io.github.backstreettoy.nullsafe.NullSafe;
 import io.github.backstreettoy.nullsafe.impl.config.WrapConfig;
@@ -65,8 +67,25 @@ public class NullSafeObjectWrapper<T> {
         return this;
     }
 
+    /**
+     * The getter methods of the wrapped object return a fake stubbed object when property is {@code null}
+     * preventing from {@code NullPointerException} be thrown in the successive operation. Invoking the
+     * getter method of fake stubbed object
+     * will only return a new fake stubbed object corresponding to the target type and there will no any affect when
+     * setters and other methods called.
+     *
+     * @return
+     */
+    public NullSafeObjectWrapper safeCall() {
+
+    }
+
     public T get() {
         return SimpleWrap.wrap((Class<T>)object.getClass(), object, policies, config);
+    }
+
+    public static <T> T eval(Object obj) {
+
     }
 
 }

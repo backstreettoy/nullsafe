@@ -88,10 +88,17 @@ public class MethodHandlerImpl<T> implements MethodHandler {
     public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
         boolean needProxy = propertyfallbackHandlers.containsKey(thisMethod);
         T referenceObj = supplier.get();
-        thisMethod.setAccessible(true);
-        Object result = thisMethod.invoke(referenceObj);
-        if (!needProxy || result != null) {
-            return result;
+        try {
+            thisMethod.setAccessible(true);
+            Object result = thisMethod.invoke(referenceObj);
+            if (!needProxy || result != null) {
+                return result;
+            }
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            LOG.error(e.toString(), e);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new OriginalMethodException(e);
         }
 
         List<AbstractFieldHandler> handlers = propertyfallbackHandlers.get(thisMethod);
@@ -167,6 +174,15 @@ public class MethodHandlerImpl<T> implements MethodHandler {
         }
 
         public UnableFallbackException() {
+        }
+    }
+
+    /**
+     * Thrown when exception occurred inside original method.
+     */
+    private static class OriginalMethodException extends RuntimeException {
+        public OriginalMethodException(Throwable cause) {
+            super(cause);
         }
     }
 }
