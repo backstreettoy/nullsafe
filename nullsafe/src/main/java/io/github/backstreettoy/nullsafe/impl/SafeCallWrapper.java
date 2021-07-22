@@ -29,10 +29,15 @@ public class SafeCallWrapper<T> {
         if (obj instanceof SafeCallWrapped) {
             SafeCallWrapped proxy = (SafeCallWrapped) obj;
             return (V)proxy.__getimpl();
-        } else if (SafeCallConstants.NULL_OBJECTS.contains(obj)) {
-            return null;
         } else {
-            return obj;
+            Object nullIndicator = SafeCallConstants.NULL_OBJECTS.get(obj);
+            if (nullIndicator != null && nullIndicator == obj) {
+                // Exactly the obj is null indicator itself.
+                return null;
+            } else {
+                // Otherwise
+                return obj;
+            }
         }
     }
 }

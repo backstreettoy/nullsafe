@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SafeCallWrapped;
 
@@ -21,7 +23,7 @@ public class SafeCallConstants {
 
 
     public static final Map<Class<?>, Object> NULL_OBJECTS_MAPPING = new HashMap<>();
-    public static final Set<Object> NULL_OBJECTS;
+    public static final Map<Object, Object> NULL_OBJECTS;
 
     static {
         NULL_OBJECTS_MAPPING.put(String.class, new String());
@@ -30,6 +32,7 @@ public class SafeCallConstants {
         NULL_OBJECTS_MAPPING.put(Short.class, new Short((short)0));
         NULL_OBJECTS_MAPPING.put(Integer.class, new Integer(0));
 
-        NULL_OBJECTS = new HashSet<>(NULL_OBJECTS_MAPPING.values());
+        NULL_OBJECTS = NULL_OBJECTS_MAPPING.values().stream()
+                .collect(Collectors.toMap(Function.identity(), Function.identity()));
     }
 }
