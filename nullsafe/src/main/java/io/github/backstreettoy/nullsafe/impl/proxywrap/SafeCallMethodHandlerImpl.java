@@ -1,9 +1,14 @@
 package io.github.backstreettoy.nullsafe.impl.proxywrap;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
+
+import io.github.backstreettoy.nullsafe.impl.safecall.SafeCallConstants;
 
 /**
  * @author backstreettoy
@@ -12,21 +17,59 @@ public class SafeCallMethodHandlerImpl implements MethodHandler {
 
     private ConcurrentHashMap<Method, SafeCallWrapped> returnValueWrappers;
 
+    private Object proxyTarget;
+
     public SafeCallMethodHandlerImpl() {
         returnValueWrappers = new ConcurrentHashMap<>();
     }
 
     @Override
     public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
-        if (returnValueWrappers.contains(thisMethod)) {
-            return returnValueWrappers.get(thisMethod);
+        String methodName = thisMethod.getName();
+        if (methodName.equals(SafeCallConstants.PROXY_TARGET_OPERATE)
+                && args != null && args.length == 1) {
+            handleProxyTarget(args);
+            return null;
+        } else if (methodName.equals(SafeCallConstants.GET_PROXY_TARGET_OPERATE)) {
+            return parseProxyTarget();
         }
 
         Class<?> returnType = thisMethod.getReturnType();
-        //基于已有object构造wrapper
-        //基于returnType构造wrapper
+        Object returnValue = null;
+        SafeCallWrapped proxy = null;
+        if (!Modifier.isFinal(returnType.getModifiers())) {
+            // Create proxy
+            proxy = returnValueWrappers.computeIfAbsent(thisMethod, key -> {
+                Proxy subInstance = GetterWrap.wrap(returnType, SafeCallConstants.INTERFACES);
+                subInstance.setHandler(new SafeCallMethodHandlerImpl());
+                return (SafeCallWrapped)subInstance;
+            });
 
-        thisMethod.setAccessible(true);
-        Object returnValue = thisMethod.invoke(self);
+        }
+        if (proxyTarget != null) {
+            returnValue = thisMethod.invoke(proxyTarget);
+        }
+        if (proxy != null) {
+            proxy.__impl(returnValue);
+            return proxy;
+        } else if (SafeCallConstants.NULL_OBJECTS_MAPPING.containsKey(returnType)) {
+            // Basic boxed data object of jdk.
+            // It will not reference more objects and return fallback value.
+            return Optional.ofNullable(returnValue).orElse(SafeCallConstants.NULL_OBJECTS_MAPPING.get(returnType));
+        } else {
+            throw new RuntimeException("Unable create proxy sub-class of type:" + returnType.getName());
+        }
+    }
+
+    private Object parseProxyTarget() {
+        return this.proxyTarget;
+    }
+
+    /**
+     * Store the proxy target of this proxy object.
+     * @param args
+     */
+    private void handleProxyTarget(Object[] args) {
+        this.proxyTarget = args[0];
     }
 }

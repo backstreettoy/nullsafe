@@ -6,4 +6,6 @@ package io.github.backstreettoy.nullsafe.impl.proxywrap;
 public interface SafeCallWrapped {
 
     void __impl(Object target);
+
+    Object __getimpl();
 }

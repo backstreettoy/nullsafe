@@ -76,16 +76,13 @@ public class NullSafeObjectWrapper<T> {
      *
      * @return
      */
-    public NullSafeObjectWrapper safeCall() {
-
+    public SafeCallWrapper<T> safeCall() {
+        return new SafeCallWrapper<>(object);
     }
 
     public T get() {
         return SimpleWrap.wrap((Class<T>)object.getClass(), object, policies, config);
     }
 
-    public static <T> T eval(Object obj) {
-
-    }
 
 }

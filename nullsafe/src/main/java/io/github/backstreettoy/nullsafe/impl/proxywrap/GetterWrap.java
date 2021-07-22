@@ -29,13 +29,12 @@ public class GetterWrap {
 
     private static Cache<Class<?>, BeanInfo> BEAN_INFO_CACHE = new LRUCache<>(1024);
 
-    public static <T> T wrap(T obj, Class<?>[] interfaces) {
-        if (obj == null) {
-            throw new NullPointerException("Obj should not be null");
+    public static <T> T wrap(Class<?> clazz, Class<?>[] interfaces) {
+        if (clazz == null) {
+            throw new NullPointerException("Clazz should not be null");
         }
-        Class<?> baseClazz = obj.getClass();
-        BeanInfo beanInfo = parseBeanInfo(baseClazz);
-        Class<?> subClazz = createSubClass(baseClazz, beanInfo, interfaces);
+        BeanInfo beanInfo = parseBeanInfo(clazz);
+        Class<?> subClazz = createSubClass(clazz, beanInfo, interfaces);
         return (T)createSubInstance(subClazz);
     }
 
@@ -59,7 +58,7 @@ public class GetterWrap {
     private static Class<?> createSubClass(Class<?> baseClazz, BeanInfo beanInfo, Class<?>[] interfaces) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setSuperclass(baseClazz);
-        proxyFactory.setFilter(new MethodFilterImpl(beanInfo));
+        proxyFactory.setFilter(new MethodFilterImpl(beanInfo, interfaces));
         proxyFactory.setInterfaces(interfaces);
         Class<?> subClazz = proxyFactory.createClass();
         return subClazz;
@@ -82,19 +81,27 @@ public class GetterWrap {
 
         private BeanInfo beanInfo;
         private Set<Method> interceptMethods;
+        private Set<Method> extraInterceptMethods;
 
-        public MethodFilterImpl(BeanInfo beanInfo) {
+        public MethodFilterImpl(BeanInfo beanInfo, Class<?>[] interfaces) {
             this.beanInfo = beanInfo;
             interceptMethods = Arrays.stream(beanInfo.getPropertyDescriptors())
                     .map(x -> x.getReadMethod())
                     .filter(x -> x != null)
                     .collect(Collectors.toSet());
 
+            if (interfaces != null) {
+                extraInterceptMethods = Arrays.stream(interfaces)
+                        .flatMap(x -> Arrays.stream(x.getMethods()))
+                        .collect(Collectors.toSet());
+            }
+
         }
 
         @Override
         public boolean isHandled(Method m) {
-            return interceptMethods.contains(m);
+            return interceptMethods.contains(m)
+                    || (extraInterceptMethods != null ? extraInterceptMethods.contains(m) : false);
         }
     }
 }
