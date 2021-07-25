@@ -36,5 +36,6 @@ public class ListObjects {
         System.out.println(eval(upperObjectProxy.getRelation().getLeft().getRelation()));
         System.out.println(eval(upperObjectProxy.getRelation().getBottom().getName()));
         System.out.println(eval(upperObjectProxy.getRelation().getRight().getName()));
+        System.out.println(eval(upperObjectProxy.getRelation().getRight().getType()));
     }
 }

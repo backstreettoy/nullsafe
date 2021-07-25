@@ -6,6 +6,7 @@ package io.github.backstreettoy.nullsafe.example.safecall;
 public class MyObject {
 
     private String name;
+    private int type;
     private ObjectRelation relation;
 
     public String getName() {
@@ -22,5 +23,13 @@ public class MyObject {
 
     public void setRelation(ObjectRelation relation) {
         this.relation = relation;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

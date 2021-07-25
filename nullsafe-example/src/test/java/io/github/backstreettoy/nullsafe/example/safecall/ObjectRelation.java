@@ -34,7 +34,7 @@ public class ObjectRelation {
         this.left = left;
     }
 
-    public final MyObject getRight() {
+    public MyObject getRight() {
         return right;
     }
 

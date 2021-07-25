@@ -62,7 +62,11 @@ public class SafeCallMethodHandlerImpl implements MethodHandler {
             // Basic boxed data object of jdk.
             // It will not reference more objects and return fallback value.
             return Optional.ofNullable(returnValue).orElse(SafeCallConstants.NULL_OBJECTS_MAPPING.get(returnType));
-        } else {
+        } else if (returnType.isPrimitive()) {
+            // Primitive type
+
+        }
+        else {
             throw new RuntimeException("Unable create proxy sub-class of type:" + returnType.getName());
         }
     }
