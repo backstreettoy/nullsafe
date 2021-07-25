@@ -1,5 +1,7 @@
 package io.github.backstreettoy.nullsafe.impl.safecall;
 
+import java.util.function.Predicate;
+
 import javassist.util.proxy.Proxy;
 
 import io.github.backstreettoy.nullsafe.impl.config.SafeCallConfig;
@@ -49,7 +51,7 @@ public class SafeCallWrapper<T> {
         return (T)proxy;
     }
 
-    public static <V> V _eval(V obj) {
+    public static <V> V evaluate(V obj) {
         if (obj instanceof SafeCallWrapped) {
             SafeCallWrapped proxy = (SafeCallWrapped) obj;
             return (V)proxy.__getimpl();
@@ -63,5 +65,24 @@ public class SafeCallWrapper<T> {
                 return obj;
             }
         }
+    }
+
+    public static <T> boolean evaluateMatch(T obj, Predicate<T> predicate) {
+        if (predicate == null) {
+            throw new NullPointerException("predicate is null");
+        }
+        T realValue = evaluate(obj);
+        return predicate.test(realValue);
+    }
+
+    public static <T> boolean evaluateNotNullThenMatch(T obj, Predicate<T> predicate) {
+        if (predicate == null) {
+            throw new NullPointerException("predicate is null");
+        }
+        T realValue = evaluate(obj);
+        if (realValue != null) {
+            return predicate.test(realValue);
+        }
+        return false;
     }
 }
