@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 
+import io.github.backstreettoy.nullsafe.impl.config.SafeCallConfig;
 import io.github.backstreettoy.nullsafe.impl.safecall.SafeCallConstants;
 
 /**
@@ -19,7 +20,10 @@ public class SafeCallMethodHandlerImpl implements MethodHandler {
 
     private Object proxyTarget;
 
-    public SafeCallMethodHandlerImpl() {
+    private SafeCallConfig config;
+
+    public SafeCallMethodHandlerImpl(SafeCallConfig config) {
+        this.config = config;
         returnValueWrappers = new ConcurrentHashMap<>();
     }
 
@@ -40,8 +44,10 @@ public class SafeCallMethodHandlerImpl implements MethodHandler {
         if (!Modifier.isFinal(returnType.getModifiers())) {
             // Create proxy
             proxy = returnValueWrappers.computeIfAbsent(thisMethod, key -> {
-                Proxy subInstance = GetterWrap.wrap(returnType, SafeCallConstants.INTERFACES);
-                subInstance.setHandler(new SafeCallMethodHandlerImpl());
+                Proxy subInstance = GetterWrap.wrap(returnType,
+                        SafeCallConstants.INTERFACES,
+                        config.isThrowExceptionWhenWrapMethodFail());
+                subInstance.setHandler(new SafeCallMethodHandlerImpl(this.config));
                 return (SafeCallWrapped)subInstance;
             });
 

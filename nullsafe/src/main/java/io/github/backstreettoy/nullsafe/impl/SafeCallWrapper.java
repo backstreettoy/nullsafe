@@ -2,6 +2,7 @@ package io.github.backstreettoy.nullsafe.impl;
 
 import javassist.util.proxy.Proxy;
 
+import io.github.backstreettoy.nullsafe.impl.config.SafeCallConfig;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.GetterWrap;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SafeCallMethodHandlerImpl;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SafeCallWrapped;
@@ -12,15 +13,35 @@ import io.github.backstreettoy.nullsafe.impl.safecall.SafeCallConstants;
  */
 public class SafeCallWrapper<T> {
 
+    private static final SafeCallConfig DEFAULT_CONFIG;
+
+    static {
+        DEFAULT_CONFIG = new SafeCallConfig();
+        DEFAULT_CONFIG.setThrowExceptionWhenWrapMethodFail(false);
+    }
+
     private T obj;
+    private SafeCallConfig config;
 
     public SafeCallWrapper(T obj) {
         this.obj = obj;
+        try {
+            this.config = DEFAULT_CONFIG.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public SafeCallWrapper<T> throwExceptionWhenWrapMethodFail() {
+        config.setThrowExceptionWhenWrapMethodFail(true);
+        return this;
     }
 
     public T get() {
-        SafeCallWrapped proxy = GetterWrap.wrap(obj.getClass(), SafeCallConstants.INTERFACES);
-        ((Proxy)proxy).setHandler(new SafeCallMethodHandlerImpl());
+        SafeCallWrapped proxy = GetterWrap.wrap(obj.getClass(),
+                SafeCallConstants.INTERFACES,
+                config.isThrowExceptionWhenWrapMethodFail());
+        ((Proxy)proxy).setHandler(new SafeCallMethodHandlerImpl(config));
         proxy.__impl(obj);
         return (T)proxy;
     }

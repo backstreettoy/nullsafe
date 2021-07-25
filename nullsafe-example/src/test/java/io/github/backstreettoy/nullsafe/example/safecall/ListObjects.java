@@ -30,6 +30,7 @@ public class ListObjects {
         bottomObject.setRelation(relationOfBottom);
 
         SafeCallWrapper<MyObject> wrapper = new SafeCallWrapper<>(upperObject);
+        wrapper.throwExceptionWhenWrapMethodFail();
         MyObject upperObjectProxy = wrapper.get();
         System.out.println(eval(upperObjectProxy.getRelation().getLeft().getName()));
         System.out.println(eval(upperObjectProxy.getRelation().getLeft().getRelation()));
