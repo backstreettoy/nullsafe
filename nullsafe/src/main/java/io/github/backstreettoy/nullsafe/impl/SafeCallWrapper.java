@@ -24,6 +24,10 @@ public class SafeCallWrapper<T> {
     private SafeCallConfig config;
 
     public SafeCallWrapper(T obj) {
+        if (obj == null) {
+            throw new NullPointerException("Obj is null");
+        }
+
         this.obj = obj;
         try {
             this.config = DEFAULT_CONFIG.clone();

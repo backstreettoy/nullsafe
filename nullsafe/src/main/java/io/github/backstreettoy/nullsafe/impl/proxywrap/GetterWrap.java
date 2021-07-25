@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import io.github.backstreettoy.nullsafe.extra.jodd.cache.Cache;
 import io.github.backstreettoy.nullsafe.extra.jodd.cache.LRUCache;
-import io.github.backstreettoy.nullsafe.extra.jodd.util.StringUtil;
 
 /**
  * @author backstreettoy
@@ -47,12 +46,23 @@ public class GetterWrap {
 
     private static Class<?> createSubClass(Class<?> baseClazz, BeanInfo beanInfo, Class<?>[] interfaces,
                                            boolean throwExceptionWhenWrapFail) {
+        checkBaseClass(baseClazz, throwExceptionWhenWrapFail);
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setSuperclass(baseClazz);
         proxyFactory.setFilter(new MethodFilterImpl(beanInfo, interfaces, throwExceptionWhenWrapFail));
         proxyFactory.setInterfaces(interfaces);
         Class<?> subClazz = proxyFactory.createClass();
         return subClazz;
+    }
+
+    private static void checkBaseClass(Class<?> baseClazz, boolean throwExceptionWhenWrapFail) {
+        int modifiers = baseClazz.getModifiers();
+        if (Modifier.isFinal(modifiers)) {
+            LOG.warn("Failed to create wrapped object to class:{}", baseClazz.getName());
+            if (throwExceptionWhenWrapFail) {
+                throw new RuntimeException("Failed to create wrapped object to class:" + baseClazz.getName());
+            }
+        }
     }
 
     private static BeanInfo parseBeanInfo(Class<?> clazz) {

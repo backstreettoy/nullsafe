@@ -2,6 +2,7 @@ package io.github.backstreettoy.nullsafe.example.safecall;
 
 import org.junit.Test;
 
+import io.github.backstreettoy.nullsafe.NullSafe;
 import io.github.backstreettoy.nullsafe.impl.SafeCallWrapper;
 import static io.github.backstreettoy.nullsafe.impl.SafeCallWrapper.eval;
 
@@ -29,9 +30,8 @@ public class ListObjects {
         relationOfBottom.setLeft(leftObject);
         bottomObject.setRelation(relationOfBottom);
 
-        SafeCallWrapper<MyObject> wrapper = new SafeCallWrapper<>(upperObject);
-        wrapper.throwExceptionWhenWrapMethodFail();
-        MyObject upperObjectProxy = wrapper.get();
+        MyObject upperObjectProxy = NullSafe.safeCall(upperObject)
+                .throwExceptionWhenWrapMethodFail().get();
         System.out.println(eval(upperObjectProxy.getRelation().getLeft().getName()));
         System.out.println(eval(upperObjectProxy.getRelation().getLeft().getRelation()));
         System.out.println(eval(upperObjectProxy.getRelation().getBottom().getName()));
