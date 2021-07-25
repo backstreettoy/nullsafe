@@ -1,4 +1,4 @@
-package io.github.backstreettoy.nullsafe.impl;
+package io.github.backstreettoy.nullsafe.impl.safecall;
 
 import javassist.util.proxy.Proxy;
 
@@ -6,7 +6,6 @@ import io.github.backstreettoy.nullsafe.impl.config.SafeCallConfig;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.GetterWrap;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SafeCallMethodHandlerImpl;
 import io.github.backstreettoy.nullsafe.impl.proxywrap.SafeCallWrapped;
-import io.github.backstreettoy.nullsafe.impl.safecall.SafeCallConstants;
 
 /**
  * @author backstreettoy
@@ -50,7 +49,7 @@ public class SafeCallWrapper<T> {
         return (T)proxy;
     }
 
-    public static <V> V eval(V obj) {
+    public static <V> V _eval(V obj) {
         if (obj instanceof SafeCallWrapped) {
             SafeCallWrapped proxy = (SafeCallWrapped) obj;
             return (V)proxy.__getimpl();

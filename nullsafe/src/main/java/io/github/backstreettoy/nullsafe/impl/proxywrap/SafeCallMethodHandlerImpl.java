@@ -10,6 +10,7 @@ import javassist.util.proxy.Proxy;
 
 import io.github.backstreettoy.nullsafe.impl.config.SafeCallConfig;
 import io.github.backstreettoy.nullsafe.impl.safecall.SafeCallConstants;
+import io.github.backstreettoy.nullsafe.impl.utils.BoxUtil;
 
 /**
  * @author backstreettoy
@@ -64,7 +65,7 @@ public class SafeCallMethodHandlerImpl implements MethodHandler {
             return Optional.ofNullable(returnValue).orElse(SafeCallConstants.NULL_OBJECTS_MAPPING.get(returnType));
         } else if (returnType.isPrimitive()) {
             // Primitive type
-
+            return BoxUtil.unbox(SafeCallConstants.PRIMITIVE_OBJECTS.get(returnType));
         }
         else {
             throw new RuntimeException("Unable create proxy sub-class of type:" + returnType.getName());

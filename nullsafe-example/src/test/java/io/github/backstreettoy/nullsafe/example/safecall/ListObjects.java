@@ -3,8 +3,7 @@ package io.github.backstreettoy.nullsafe.example.safecall;
 import org.junit.Test;
 
 import io.github.backstreettoy.nullsafe.NullSafe;
-import io.github.backstreettoy.nullsafe.impl.SafeCallWrapper;
-import static io.github.backstreettoy.nullsafe.impl.SafeCallWrapper.eval;
+import static io.github.backstreettoy.nullsafe.NullSafe.eval;
 
 /**
  * @author backstreettoy
