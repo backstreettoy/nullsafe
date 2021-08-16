@@ -26,3 +26,4 @@ Location exists:false
 # How it works
 This utility wraps target object and properties by dynamic proxies nested, and each proxy acts as an automatic Optional class preventing from NullPointerException raising. It is not magic but it can save your time when dealing with many properties potentially nullable.
 
+![Proxy structure](../architecture.png)
