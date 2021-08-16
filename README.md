@@ -22,6 +22,10 @@ Longitude:null
 Latitude:null
 Location exists:false
 ```
+# Usage
+All utility methods provided in NullSafe class in fluent style, all you need do is to follow the two steps:
+* Wrap the object by the safeCall and get the wrapped object.
+* Get the real result from the wrapped object by eval method.
 
 # How it works
 This utility wraps target object and properties by dynamic proxies nested, and each proxy acts as an automatic Optional class preventing NullPointerException from  raising. It is not magic but it can save your time when dealing with many properties potentially nullable.
@@ -33,7 +37,9 @@ This utility won't pollute your data object. The structure of proxies graph show
 This utility only prevents NullPointerException from raising in the invocation of getter method for that shadowing an exception from raising in write method will result in unexpected result.
 
 # Cautions
-This utility won't work when the target object or method is final because it couldn't be overrided so that exception will raise if a final object passed to the safeCall method. However lots of class in JDK such as Integer is final and we take an effort to solve the problem for these final classes in JDK to make the utility more usable.
+* This utility won't work when the target object or method is final because it couldn't be overrided so that exception will raise if a final object passed to the safeCall method. However lots of class in JDK such as Integer is final and we take an effort to solve the problem for these final classes in JDK to make the utility more usable.
+
+* Like the Optional class there must be end with get or orElse method, you must get the real result by eval method.
 
 
 
