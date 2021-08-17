@@ -7,6 +7,7 @@ Cellphone cellphone = new Cellphone();
 // Set the location of cellphone is null.
 cellphone.setLocation(null);
 Cellphone wrappedCellphone = NullSafe.safeCall(cellphone).get();
+
 // Normally NullPointerException will be raised in getLongitude but here will not.
 System.out.printf("Longitude:%.5f\n", NullSafe.eval(wrappedCellphone.getLocation().getLongitude()));
 System.out.printf("Latitude:%.5f\n", NullSafe.eval(wrappedCellphone.getLocation().getLatitude()));
