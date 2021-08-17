@@ -1,4 +1,4 @@
-**If you want to GET RID OF NullPointerException, you could try me. This utility provides a mechanism for the NullPointerException free method invocation. **
+**If you want to GET RID OF NullPointerException, you could try me. This utility provides a mechanism for the NullPointerException free method invocation.**
 
 # Example
 
