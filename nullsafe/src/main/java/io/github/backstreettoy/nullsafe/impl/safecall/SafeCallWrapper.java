@@ -75,7 +75,7 @@ public class SafeCallWrapper<T> {
         return predicate.test(realValue);
     }
 
-    public static <T> boolean evaluateNotNullThenMatch(T obj, Predicate<T> predicate) {
+    public static <T> Boolean evaluateMatchWithDefault(T obj, Predicate<T> predicate, Boolean defaultValue) {
         if (predicate == null) {
             throw new NullPointerException("predicate is null");
         }
@@ -83,6 +83,6 @@ public class SafeCallWrapper<T> {
         if (realValue != null) {
             return predicate.test(realValue);
         }
-        return false;
+        return defaultValue;
     }
 }

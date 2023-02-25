@@ -7,14 +7,12 @@ public class User {
 
     private Long id;
     private String userName;
-    private Integer level;
-    private Long score;
-    private String optionalName;
 
     private int age;
 
-    private String jobDescription;
-    private String educationDescription;
+    private Address homeAddress;
+
+    private Address companyAddress;
 
     public Long getId() {
         return id;
@@ -32,46 +30,6 @@ public class User {
         this.userName = userName;
     }
 
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public String getOptionalName() {
-        return optionalName;
-    }
-
-    public void setOptionalName(String optionalName) {
-        this.optionalName = optionalName;
-    }
-
-    public Long getScore() {
-        return score;
-    }
-
-    public void setScore(Long score) {
-        this.score = score;
-    }
-
-    public String getJobDescription() {
-        return jobDescription;
-    }
-
-    public void setJobDescription(String jobDescription) {
-        this.jobDescription = jobDescription;
-    }
-
-    public String getEducationDescription() {
-        return educationDescription;
-    }
-
-    public void setEducationDescription(String educationDescription) {
-        this.educationDescription = educationDescription;
-    }
-
     public int getAge() {
         return age;
     }
@@ -79,4 +37,21 @@ public class User {
     public void setAge(int age) {
         this.age = age;
     }
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public Address getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(Address companyAddress) {
+        this.companyAddress = companyAddress;
+    }
+
 }
