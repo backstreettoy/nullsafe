@@ -28,9 +28,9 @@ public class Example {
         // Wrap the original object by nullsafe.
         user = NullSafe.safeCall(user).get();
 
-        Assert.assertEquals(1d, (double)user.getId(), 0d);
         // It is ok because homeAddress property is not null.
-        String provinceOfHomeAddress = user.getHomeAddress().getProvince();
+        Assert.assertEquals("Any", user.getHomeAddress().getProvince());
+
         // Normal it will raise a NPE for the companyAddress property is null.
         // But it won't because nullSafe wrapped the User object and created a
         // stub object for the null property.
